@@ -1,5 +1,5 @@
 
-import { Box, Button, TextField, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Button, TextField, Tab, Tabs, Typography, buttonGroupClasses } from "@mui/material";
 
 import {
   FormControl,
@@ -120,11 +120,11 @@ const InstallerForm = () => {
       <Header title="Installer Details" subtitle="View and Update your Installer team details" />
 
       <Tabs value={tabIndex} onChange={handleTabChange}>
-        <Tab label="Personal Information" sx={{ '&.Mui-selected': { backgroundColor: '#00C853', borderRadius: '20px 20px 0px 0px', color: '#fff' } }}>
+        <Tab label="Personal Information" sx={{ '&.Mui-selected': { backgroundColor: '#96D232', borderRadius: '20px 20px 0px 0px', color: '#fff' } }}>
         </Tab>
-        <Tab label="Licenses & Insurance" sx={{ '&.Mui-selected': { backgroundColor: '#90ee90', borderRadius: '20px 20px 0px 0px' } }}>
+        <Tab label="Licenses & Insurance" sx={{ '&.Mui-selected': { backgroundColor: '#96D232', borderRadius: '20px 20px 0px 0px' } }}>
         </Tab>
-        <Tab label="Additional Information" sx={{ '&.Mui-selected': { backgroundColor: '#90ee90', borderRadius: '20px 20px 0px 0px' } }}>
+        <Tab label="Additional Information" sx={{ '&.Mui-selected': { backgroundColor: '#96D232', borderRadius: '20px 20px 0px 0px' } }}>
         </Tab>
       </Tabs>
 
@@ -363,7 +363,7 @@ const InstallerForm = () => {
             </Grid>
 
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button type="submit"  style={{backgroundColor:"#F0DD5D" , padding:"8px"}} variant="contained">
                 Submit and Continue
               </Button>
             </Box>
@@ -750,7 +750,7 @@ const InstallerForm = () => {
               }}
             />
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button type="submit" style={{backgroundColor:"#F0DD5D" , padding:"8px"}} variant="contained">
                 Submit and Continue
               </Button>
             </Box>

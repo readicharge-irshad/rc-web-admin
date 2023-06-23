@@ -3,10 +3,21 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, useTheme } from "@mui/material";
-import { getInstallerList ,getServiceNameById } from "../../data/ApiController.js";
+import { Box, Typography, useTheme, Button } from "@mui/material";
+import { getInstallerList, deleteInstaller, updateInstaller, getServiceNameById } from "../../data/ApiController.js";
 import InstallerServicesPieChart from "../../components/PieChart";
 import GeographyChart_02 from "../../components/Geographychart_02";
+
+
+const handleDelete = async (id) => {
+  await deleteInstaller(id);
+  getInstallerList(); // Refresh the installer list after deletion
+};
+
+const handleUpdate = async (id, row) => {
+  await updateInstaller(id, row);
+  getInstallerList(); // Refresh the installer list after update
+};
 
 const states = [
   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
@@ -110,35 +121,64 @@ const InstallerList = () => {
       field: "firstName",
       headerName: "Name",
       flex: 1,
+      editable: true, // Make this cell editable
       cellClassName: "name-column--cell",
     },
     {
       field: "email",
       headerName: "Email",
       flex: 1,
+      editable: true, // Make this cell editable
     },
     {
       field: "state",
       headerName: "State",
       headerAlign: "left",
       align: "left",
+      editable: true, // Make this cell editable
     },
     {
       field: "zip",
       headerName: "Zip Code",
       flex: 1,
+      editable: true, // Make this cell editable
     },
     {
       field: "Number_of_bookings",
       headerName: "Jobs Completed",
       flex: 1,
+      editable: true, // Make this cell editable
     },
     {
       field: "ratingsAndReviews",
       headerName: "Rating",
       flex: 1,
+      editable: true, // Make this cell editable
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 200,
+      renderCell: (params) => (
+        <Box>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => handleDelete(params.row.id)}
+          >
+            Delete
+          </Button>
+          <Button
+            variant="contained"
+            style={{ marginLeft: "16px" }}
+            color="primary"
+            onClick={() => handleUpdate(params.row.id, params.row)}
+          >
+            Update
+          </Button>
+        </Box>
+      ),
     }
-
   ];
   return (
     <div style={{ overflowY: 'auto', height: 'calc(100vh - 150px)' }}>
@@ -180,12 +220,28 @@ const InstallerList = () => {
             },
           }}
         >
-          <DataGrid
-            rows={getInstaller}
-            columns={columns}
-            components={{ Toolbar: GridToolbar }}
-
-          />
+<DataGrid
+  rows={getInstaller}
+  columns={columns}
+  components={{ Toolbar: GridToolbar }}
+  editMode="cell"
+  onEditCellChange={(params) => {
+    if (
+      params.field === "firstName" ||
+      params.field === "email" ||
+      params.field === "state" ||
+      params.field === "zip" ||
+      params.field === "Number_of_bookings" ||
+      params.field === "ratingsAndReviews"
+    ) {
+      const updatedRow = {
+        ...params.row,
+        [params.field]: params.value,
+      };
+      handleUpdate(updatedRow);
+    }
+  }}
+/>
         </Box>
         <div style={{ display: 'flex', flexDirection: 'row'  ,marginTop:"20px"}}>
         <div style={{ flex: 1 }}>

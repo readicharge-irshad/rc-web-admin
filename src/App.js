@@ -20,29 +20,35 @@ import CreateBookingForm from "./scenes/bookings";
 import CustomerForm from "./scenes/customer";
 import AdminForm from "./scenes/admin";
 import LoginScreen from "./scenes/login";
+import AdminList from "./scenes/admin/AdminList";
+import NotAllowed from "./scenes/dashboard/NotAllowed";
 
-function App() {
+const fixedUserName = "johndoe@example.com"
+ function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName,setUserName] = useState('');
-
-  const handleLogin = (isValid) => {
+  const [userName, setUserName] = useState('');
+   const handleLogin = (isValid) => {
     if (isValid) {
       setIsLoggedIn(true);
     }
   };
-
-  return (
+   const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserName('');
+    return <Navigate to="/login" />;
+  };
+   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
           {isLoggedIn ? (
             <>
-              <Sidebar isSidebar={isSidebar}  username={userName} isLoggedIn={isLoggedIn}  />
+              <Sidebar isSidebar={isSidebar} username={userName} isLoggedIn={isLoggedIn} />
               <main className="content">
-                <Topbar setIsSidebar={setIsSidebar} />
+                <Topbar setIsSidebar={setIsSidebar} handleLogout={handleLogout} />
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" />} />
                   <Route path="/dashboard" element={<Dashboard />} />
@@ -50,16 +56,18 @@ function App() {
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/jobs" element={<Invoices />} />
                   <Route path="/form" element={<Form />} />
-                  <Route path="/installerForm" element={<InstallerForm />} />
-                  <Route path="/labourRate" element={<InstallerLabourRates />} />
-                  <Route path="/materialTax" element={<MaterialTaxForm />} />
-                  <Route path="/material" element={<Material />} />
-                  <Route path="/service" element={<Service />} />
-                  <Route path="/serviceTime" element={<ServiceTime />} />
-                  <Route path="/servicePrice" element={<ServicePrice />} />
+                  <Route path="/installerForm" element={<InstallerForm/>} />
+                  <Route path="/labourRate" element={userName===fixedUserName ?<InstallerLabourRates />:<NotAllowed handleLogout={handleLogout}/>} />
+                  <Route path="/materialTax" element={userName===fixedUserName ?<MaterialTaxForm />:<NotAllowed handleLogout={handleLogout}/>} />
+                  <Route path="/material" element={userName===fixedUserName ?<Material />:<NotAllowed handleLogout={handleLogout}/>} />
+                  <Route path="/service" element={userName===fixedUserName ?<Service />:<NotAllowed handleLogout={handleLogout}/>} />
+                  <Route path="/serviceTime" element={userName===fixedUserName ?<ServiceTime />:<NotAllowed handleLogout={handleLogout}/>} />
+                  <Route path="/servicePrice" element={userName===fixedUserName ?<ServicePrice />:<NotAllowed handleLogout={handleLogout}/>} />
                   <Route path="/bookingForm" element={<CreateBookingForm />} />
                   <Route path="/customerForm" element={<CustomerForm />} />
-                  <Route path="/admin" element={<AdminForm />} />
+                  <Route path="/admin" element={userName===fixedUserName ?<AdminForm />:<NotAllowed handleLogout={handleLogout}/>} />
+                  <Route path="/admin-list" element={userName===fixedUserName ?<AdminList />:<NotAllowed handleLogout={handleLogout}/>} />
+
                 </Routes>
               </main>
             </>
@@ -71,5 +79,4 @@ function App() {
     </ColorModeContext.Provider>
   );
 }
-
-export default App;
+ export default App;

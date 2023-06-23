@@ -1,4 +1,5 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import Header from "../../components/Header";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useTheme } from "@mui/material";
 import { tokens } from "../../theme";
@@ -21,6 +22,11 @@ const BookingTable = ({  }) => {
         for (const index in callDataObject.data) {
         const dataObject = callDataObject.data[index]
         const serviceName = await getServiceNameById(dataObject.service);
+        const materials = [];
+        for(const i in dataObject.material_details) { 
+          materials.push(dataObject.material_details[i]);
+          console.log(dataObject.material_details[i]);
+        }
      
         const dataToBePushed = {
           id: dataObject._id,
@@ -30,7 +36,7 @@ const BookingTable = ({  }) => {
           number_of_installs: dataObject.number_of_installs,
           materialCost: dataObject.materialCost,
           materialTax: dataObject.materialTax,
-          material_details: dataObject.material_details,
+          material_details: materials,
           customerShowingCost: dataObject.customerShowingCost,
           paymentStatus: dataObject.paymentStatus,
           completionStatus: dataObject.completionStatus,
@@ -96,6 +102,10 @@ const BookingTable = ({  }) => {
 
   return (
     <Box m="20px">
+       <Header
+          title="Tickets List"
+          subtitle="Managing the Bookings on the platform"
+        />
       <Box
         m="40px 0 0 0"
         height="75vh"

@@ -52,6 +52,10 @@ const Item = ({ title, to, icon, selected, setSelected, isLoggedIn, username }) 
       active={selected === title}
       style={{
         color: colors.grey[200],
+        backgroundColor:selected === title ? "#94d034":"inherit",
+        marginLeft:"-25px",
+        borderTopRightRadius: selected === title ? "23px" : 0,
+        borderBottomRightRadius:selected === title ? "23px" :0,
         pointerEvents: isSectionEnabled() ? "auto" : "none",
         opacity: isSectionEnabled() ? 1 : 0.5,
       }}
@@ -121,7 +125,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
 
           {!isCollapsed && (
             <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
+             { username===fixed_username && <Box display="flex" justifyContent="center" alignItems="center">
                 <img
                   alt="profile-user"
                   width="100px"
@@ -129,7 +133,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
                   src={`../../assets/user.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
-              </Box>
+              </Box>}
               <Box textAlign="center">
                 <Typography
                   variant="h4"
@@ -139,9 +143,13 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
                 >
                   {username}
                 </Typography>
-                <Typography variant="h5" color={colors.grey[500]}>
-                  Super Admin
-                </Typography>
+                { username===fixed_username ?
+               ( <Typography variant="h5" color={colors.grey[500]}>
+               Super Admin
+             </Typography>):( <Typography variant="h5" color={colors.grey[500]}>
+                  Sub  Admin
+                </Typography>)
+}
               </Box>
             </Box>
           )}
@@ -183,13 +191,13 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               username={fixed_username}
             />
             <Item
-              title="Admin Users"
-              to="/"
+              title="Admins"
+              to="admin-list"
               icon={<SupervisorAccountOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
             />
             <Item
               title="Companies"
@@ -250,8 +258,8 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               icon={<AdminPanelSettingsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
             />
 
             <Typography
@@ -263,7 +271,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
             </Typography>
             <Item
               title="Manage Services"
-              to="/service"
+              to="service"
               icon={<BorderColorOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
