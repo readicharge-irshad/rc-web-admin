@@ -26,7 +26,7 @@ import { getserviceTimeList,getServiceNameById } from "../../data/ApiController.
       const dataObject = data.data[i];
     
         let data_to_be_pushed = {
-          id : dataObject._id,
+          id : `RC-SETM-${dataObject._id}`,
           service_name: await getServiceNameById(dataObject.service_id),
           number_of_installs : dataObject.number_of_installs,
           time_min : dataObject.time_min,

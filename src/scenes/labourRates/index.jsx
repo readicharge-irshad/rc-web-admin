@@ -12,7 +12,7 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import GeographyChart from '../../components/GeographyChart';
+import Header from '../../components/Header.jsx';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { getLabourRate, createLabourRate, getserviceList } from '../../data/ApiController.js';
 
@@ -30,109 +30,113 @@ const states = [
 ];
 
 const LabourRateForm = () => {
-const [serviceList, setServiceList] = useState([]);
-const [selectedService, setSelectedService] = useState('');
-const [labourRatesList, setLabourRatesList] = useState([]);
-const [formState, setFormState] = useState([]);
+  const [serviceList, setServiceList] = useState([]);
+  const [selectedService, setSelectedService] = useState('');
+  const [labourRatesList, setLabourRatesList] = useState([]);
+  const [formState, setFormState] = useState([]);
 
-useEffect(() => {
-  fetchData();
-}, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-useEffect(() => {
-  const fetchServiceList = async () => {
-    const response = await getserviceList();
-    if (response && response.data) {
-      setServiceList(response.data);
-    }
-  };
-  fetchServiceList();
-}, []);
-
-useEffect(() => {
-  const createDefaultFormState = () => {
-    const defaultFormState = states.map((state) => ({
-      state: state,
-      prices: [0, 0, 0]
-    }));
-    setFormState(defaultFormState);
-  };
-
-  createDefaultFormState();
-}, []);
-
-async function fetchData() {
-  const data = await getLabourRate();
-  if (data.data) {
-    console.log(data.data);
-    setLabourRatesList(data.data);
-  }
-}
-
-const handleInputChange = (event, index, priceIndex) => {
-  const { value } = event.target;
-  const updatedFormState = [...formState];
-  updatedFormState[index].prices[priceIndex] = value;
-  setFormState(updatedFormState);
-};
-
-const handleSubmit = async (event) => {
-  event.preventDefault();
-
-  // Submitting the form three times
-  for (let i = 0; i < 3; i++) {
-    const data = {
-      price_statewise: formState.map((item) => ({
-        state: item.state,
-        price: item.prices[i]
-      })),
-      number_of_installs: i + 1,
-      service_id: selectedService,
+  useEffect(() => {
+    const fetchServiceList = async () => {
+      const response = await getserviceList();
+      if (response && response.data) {
+        setServiceList(response.data);
+      }
     };
-    await createLabourRate(data);
+    fetchServiceList();
+  }, []);
+
+  useEffect(() => {
+    const createDefaultFormState = () => {
+      const defaultFormState = states.map((state) => ({
+        state: state,
+        prices: [0, 0, 0]
+      }));
+      setFormState(defaultFormState);
+    };
+
+    createDefaultFormState();
+  }, []);
+
+  async function fetchData() {
+    const data = await getLabourRate();
+    if (data.data) {
+      console.log(data.data);
+      setLabourRatesList(data.data);
+    }
   }
 
-  fetchData();
-};
+  const handleInputChange = (event, index, priceIndex) => {
+    const { value } = event.target;
+    const updatedFormState = [...formState];
+    updatedFormState[index].prices[priceIndex] = value;
+    setFormState(updatedFormState);
+  };
 
-const handleRowClick = (labourRate) => {
-  const updatedFormState = labourRate.price_statewise.map((correspondingItem) => {
-    const correspondingState = formState.find((item) => item.state === correspondingItem.state);
-    const prices = correspondingState ? correspondingState.prices : [0, 0, 0];
-    return { state: correspondingItem.state, prices };
-  });
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  setSelectedService(labourRate.service_id);
-  setFormState(updatedFormState);
-};
+    // Submitting the form three times
+    for (let i = 0; i < 3; i++) {
+      const data = {
+        price_statewise: formState.map((item) => ({
+          state: item.state,
+          price: item.prices[i]
+        })),
+        number_of_installs: i + 1,
+        service_id: selectedService,
+      };
+      await createLabourRate(data);
+    }
 
-const handleServiceSelect = (event) => {
-  const selectedServiceId = event.target.value;
-  const selectedLabourRates = labourRatesList.filter((labourRate) => labourRate.service_id === selectedServiceId);
+    fetchData();
+  };
 
-  if (selectedLabourRates && selectedLabourRates.length > 0) {
-    const updatedFormState = states.map((state) => {
-      const prices = selectedLabourRates.map((labourRate) => {
-        const correspondingStatePrice = labourRate.price_statewise.find((item) => item.state === state);
-        return correspondingStatePrice ? correspondingStatePrice.price : 0;
-      });
-      return { state: state, prices: prices };
+  const handleRowClick = (labourRate) => {
+    const updatedFormState = labourRate.price_statewise.map((correspondingItem) => {
+      const correspondingState = formState.find((item) => item.state === correspondingItem.state);
+      const prices = correspondingState ? correspondingState.prices : [0, 0, 0];
+      return { state: correspondingItem.state, prices };
     });
 
+    setSelectedService(labourRate.service_id);
     setFormState(updatedFormState);
+  };
+
+  const handleServiceSelect = (event) => {
+    const selectedServiceId = event.target.value;
+    const selectedLabourRates = labourRatesList.filter((labourRate) => labourRate.service_id === selectedServiceId);
+
+    if (selectedLabourRates && selectedLabourRates.length > 0) {
+      const updatedFormState = states.map((state) => {
+        const prices = selectedLabourRates.map((labourRate) => {
+          const correspondingStatePrice = labourRate.price_statewise.find((item) => item.state === state);
+          return correspondingStatePrice ? correspondingStatePrice.price : 0;
+        });
+        return { state: state, prices: prices };
+      });
+
+      setFormState(updatedFormState);
+    }
+
+    setSelectedService(selectedServiceId);
+  };
+
+
+  if (!serviceList || serviceList.length === 0) {
+    return <div>Sorry, you have to create Services first</div>;
   }
-
-  setSelectedService(selectedServiceId);
-};
-
-
-if (!serviceList || serviceList.length === 0) {
-  return <div>Sorry, you have to create Services first</div>;
-}
 
 
   return (
+<>
+<Header title="Labour Rates" subtitle="Manage your labour rate" />
     <div style={{ display: 'flex' }}>
+       
+
       <FormControl sx={{ minWidth: 120, marginLeft: '20px' }}>
         <InputLabel id="service-select-label">Service</InputLabel>
         <Select
@@ -192,36 +196,38 @@ if (!serviceList || serviceList.length === 0) {
             </div>
           </Grid>
           <Grid item>
-            <Button variant="contained" type="submit" fullWidth style={{padding:"20px"}}>
+            <Button variant="contained" type="submit" fullWidth style={{ padding: "20px" }}>
               Submit
             </Button>
           </Grid>
         </Grid>
       </form>
 
-      <Paper sx={{ backgroundColor: "inherit", boxShadow: 1 }}>
-      <Table sx={{ minWidth: 400 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ fontWeight: "bold" }}>Service ID</TableCell>
-            <TableCell sx={{ fontWeight: "bold" }}>Number of Installs</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {labourRatesList.map((labourRate) => (
-            <TableRow
-              key={labourRate._id}
-              onClick={() => handleRowClick(labourRate)}
-              style={{ cursor: "pointer" }}
-            >
-              <TableCell>{labourRate.service_id}</TableCell>
-              <TableCell>{labourRate.number_of_installs}</TableCell>
+      <Paper sx={{ backgroundColor: "#f5f5f5", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)" }}>
+        <Table sx={{ minWidth: 400 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#96D232" }}>Service ID</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#96D232" }}>Number of Installs</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Paper>
+          </TableHead>
+          <TableBody>
+            {labourRatesList.map((labourRate) => (
+              <TableRow
+                key={labourRate._id}
+                onClick={() => handleRowClick(labourRate)}
+                style={{ cursor: "pointer", backgroundColor: "#ffffff" }}
+              >
+                <TableCell>RC-SERV-{labourRate.service_id}</TableCell>
+                <TableCell>{labourRate.number_of_installs}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
+
     </div>
+</>
   );
 };
 

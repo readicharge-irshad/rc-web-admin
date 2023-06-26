@@ -29,7 +29,7 @@ const BookingTable = ({  }) => {
         }
      
         const dataToBePushed = {
-          id: dataObject._id,
+          id: `RC-TOK-${dataObject._id}`,
           date: dataObject.date,
           time_start: dataObject.time_start,
           time_end: dataObject.time_end,
@@ -40,7 +40,7 @@ const BookingTable = ({  }) => {
           customerShowingCost: dataObject.customerShowingCost,
           paymentStatus: dataObject.paymentStatus,
           completionStatus: dataObject.completionStatus,
-          installer: dataObject.installer,
+          installer:`RC-I-${dataObject.installer}`,
           service: serviceName,
           service_id:dataObject.service,
           machinePurchasedByUser: dataObject.machinePurchasedByUser,
@@ -56,10 +56,12 @@ const BookingTable = ({  }) => {
   
 
 
-
   const handleDelete = async (id) => {
-    await deleteBooking(id);
-    FetchData(); // Refresh the bookings list after deletion
+    const confirmDelete = window.confirm(`This field with ID ${id} will be permanently deleted. Are you sure?`);
+    if (confirmDelete) {
+      await deleteBooking(id);
+      FetchData(); // Refresh the bookings list after deletion
+    }
   };
 
   const handleUpdate = async (id,row) => {
@@ -72,11 +74,11 @@ const BookingTable = ({  }) => {
     { field: "date", headerName: "Date", width: 200, editable: true },
     { field: "time_start", headerName: "Start Time", width: 150, editable: true },
     { field: "time_end", headerName: "End Time", width: 150, editable: true },
-    { field: "number_of_installs", headerName: "Number of Installs", width: 200, editable: true },
-    { field: "materialCost", headerName: "Material Cost", width: 200, editable: true },
-    { field: "materialTax", headerName: "Material Tax", width: 200, editable: true },
+    { field: "number_of_installs", headerName: "Number of Installs", width: 200, },
+    { field: "materialCost", headerName: "Material Cost", width: 200,  },
+    { field: "materialTax", headerName: "Material Tax", width: 200,  },
     { field: "material_details", headerName: "Material Details", width: 400 },
-    { field: "customerShowingCost", headerName: "Customer Showing Cost", width: 250, editable: true },
+    { field: "customerShowingCost", headerName: "Customer Showing Cost", width: 250,  },
     { field: "paymentStatus", headerName: "Payment Status", width: 200 },
     { field: "completionStatus", headerName: "Completion Status", width: 200 },
     { field: "installer", headerName: "Installer", width: 200 },

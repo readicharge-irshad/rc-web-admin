@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
-import Dashboard from "./scenes/dashboard";
+import DashboardComponent from "./scenes/dashboard";
 import InstallerList from "./scenes/team";
 import Invoices from "./scenes/invoices";
 import Contacts from "./scenes/contacts";
@@ -22,6 +22,7 @@ import AdminForm from "./scenes/admin";
 import LoginScreen from "./scenes/login";
 import AdminList from "./scenes/admin/AdminList";
 import NotAllowed from "./scenes/dashboard/NotAllowed";
+import UnderProgress from "./scenes/dashboard/Progress";
 
 const fixedUserName = "johndoe@example.com"
  function App() {
@@ -51,7 +52,8 @@ const fixedUserName = "johndoe@example.com"
                 <Topbar setIsSidebar={setIsSidebar} handleLogout={handleLogout} />
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/under-progress" element={<UnderProgress/>} />
+                  <Route path="/dashboard" element={<DashboardComponent />} />
                   <Route path="/installer" element={<InstallerList />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/jobs" element={<Invoices />} />

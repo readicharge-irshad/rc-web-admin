@@ -23,7 +23,7 @@ const Material = () => {
           const dataObject = data.data[i];
         
             let data_to_be_pushed = {
-              id : dataObject._id,
+              id : `RC-MAT-${dataObject._id}`,
               service_name: await getServiceNameById(dataObject.service_id),
               material_name : dataObject.material_name,
               material_desc : dataObject.material_desc,

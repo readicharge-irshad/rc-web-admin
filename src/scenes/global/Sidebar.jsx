@@ -183,7 +183,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
             />
             <Item
               title="Customers"
-              to="/"
+              to="/under-progress"
               icon={<PermIdentityOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -201,7 +201,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
             />
             <Item
               title="Companies"
-              to="/"
+              to="/under-progress"
               icon={<BusinessOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -271,7 +271,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
             </Typography>
             <Item
               title="Manage Services"
-              to="service"
+              to="/service"
               icon={<BorderColorOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

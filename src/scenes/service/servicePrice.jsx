@@ -25,7 +25,7 @@ import { getServicePriceList,getServiceNameById } from "../../data/ApiController
       const dataObject = data.data[i];
         console.log(dataObject)
         let data_to_be_pushed = {
-          id : dataObject._id,
+          id : `RC-SEPR-${dataObject._id}`,
           service_name: await getServiceNameById(dataObject.service_id),
           number_of_installs : dataObject.number_of_installs,
           price : dataObject.price

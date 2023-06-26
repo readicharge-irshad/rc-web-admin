@@ -26,6 +26,22 @@ const InstallerForm = () => {
   const [serviceList, setServiceList] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectedState, setSelectedState] = useState('');
+  const [milesDistance, setMilesDistance] = useState("");
+  const [yearsOfExperience, setYearsOfExperience] = useState("");
+  const [bondAmount, setBondAmount] = useState("");
+  const [formData1, setFormData1] = useState({});
+  const [formData2, setFormData2] = useState({});
+
+  const handleBondAmountChange = (event) => {
+    const value = event.target.value;
+    setBondAmount(value);
+  };
+
+  const handleBondAmountBlur = () => {
+    if (bondAmount < 10000) {
+      setBondAmount("10000");
+    }
+  };
 
   useEffect(() => {
     const fetchServiceList = async () => {
@@ -36,6 +52,17 @@ const InstallerForm = () => {
     };
     fetchServiceList();
   }, []);
+
+  const handleYearsOfExperienceChange = (event) => {
+    const value = event.target.value;
+    if (value >= 0 && value <= 25) {
+      setYearsOfExperience(value);
+    }
+  };
+
+  const handleMilesDistanceChange = (event) => {
+    setMilesDistance(event.target.value);
+  };
 
   const handleDateFocus = () => {
     setIsDateActive(true);
@@ -68,36 +95,18 @@ const InstallerForm = () => {
   };
 
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [formData1, setFormData1] = useState({});
-  const [formData2, setFormData2] = useState({});
 
   const handleFormSubmit_01 = (event) => {
     event.preventDefault();
-    const fields = [
-      'user_id', 'firstName', 'lastName', 'companyName', 'email', 'password',
-      'phoneNumber', 'yearsOfExperience', 'description', 'addressLine1',
-      'addressLine2', 'city', 'zip', 'miles_distance', 'state'
-    ];
-    const data = fields.reduce((acc, field) => {
-      acc[field] = event.target[field].value;
-      return acc;
-    }, {});
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
     setFormData1(data);
   };
 
   const handleFormSubmit_02 = (event) => {
     event.preventDefault();
-    const fields = [
-      'licenseNumber', 'licenseExpirationDate', 'businessInsuranceCompany',
-      'businessInsuranceNumber', 'businessAgentPhoneNumber', 'businessPolicyNumber',
-      'businessInsuranceEffectiveStartDate', 'businessInsuranceEffectiveEndDate',
-      'bondingCertificationNumber', 'bondingCompany', 'bondingAgentPhoneNumber',
-      'bondAmount', 'bondingEffectiveStartDate', 'bondingEffectiveEndDate'
-    ];
-    const data = fields.reduce((acc, field) => {
-      acc[field] = event.target[field].value;
-      return acc;
-    }, {});
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
     setFormData2(data);
   };
 
@@ -128,9 +137,7 @@ const InstallerForm = () => {
         </Tab>
       </Tabs>
 
-
-      <form onSubmit={handleFormSubmit_01}
-      >
+      <form onSubmit={handleFormSubmit_01}>
         {tabIndex === 0 && (
           // Personal Information
           <Box
@@ -141,34 +148,20 @@ const InstallerForm = () => {
               "& > div": {
                 gridColumn: isNonMobile ? undefined : "span 4",
               },
+              backgroundColor: "#f5f5f5",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              padding: "20px",
             }}
           >
             {/* Add Personal Information fields here */}
-
             <TextField
               fullWidth
               variant="filled"
               type="text"
-              label="User ID"
-
-
-              //value={values.user_id}
-              name="user_id"
-              id="user_id"
-
-              sx={{ gridColumn: "span 1" }}
-            />
-            <TextField
-              fullWidth
-              variant="filled"
-              type="text"
+              value={formData1.firstName}
               label="First Name"
-
-
-              //value={values.firstName}
               name="firstName"
               id="firstName"
-
               sx={{ gridColumn: "span 1" }}
             />
             <TextField
@@ -176,13 +169,9 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="Last Name"
-
-
-              //value={values.lastName}
+              value={formData1.lastName}
               name="lastName"
               id="lastName"
-              //error={!!touched.lastName && !!errors.lastName}
-              //helperText={touched.lastName && errors.lastName}
               sx={{ gridColumn: "span 1" }}
             />
             <TextField
@@ -190,13 +179,9 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="Company Name"
-
-
-              //value={values.companyName}
+              value={formData1.companyName}
               name="companyName"
               id="companyName"
-              //error={!!touched.companyName && !!errors.companyName}
-              //helperText={touched.companyName && errors.companyName}
               sx={{ gridColumn: "span 1" }}
             />
             <TextField
@@ -204,45 +189,29 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="Email"
-
-
-              //value={values.email}
+              value={formData1.email}
               name="email"
               id="email"
-              //error={!!touched.email && !!errors.email}
-              //helperText={touched.email && errors.email}
               sx={{ gridColumn: "span 2" }}
             />
-
             <TextField
               fullWidth
               variant="filled"
               type="password"
               label="Password"
-
-
-              //value={values.password}
+              value={formData1.password}
               name="password"
               id="password"
-              //error={!!touched.password && !!errors.password}
-              //helperText={touched.password && errors.password}
               sx={{ gridColumn: "span 2" }}
             />
-
-
-
             <TextField
               fullWidth
               variant="filled"
               type="text"
               label="Phone Number"
-
-
-              //value={values.phoneNumber}
+              value={formData1.phoneNumber}
               name="phoneNumber"
               id="phoneNumber"
-              //error={!!touched.phoneNumber && !!errors.phoneNumber}
-              //helperText={touched.phoneNumber && errors.phoneNumber}
               sx={{ gridColumn: "span 1" }}
             />
             <TextField
@@ -250,13 +219,11 @@ const InstallerForm = () => {
               variant="filled"
               type="number"
               label="Years of Experience"
-
-
-              //value={values.yearsOfExperience}
+              value={formData1.yearsOfExperience}
               name="yearsOfExperience"
               id="yearsOfExperience"
-              //error={!!touched.yearsOfExperience && !!errors.yearsOfExperience}
-              //helperText={touched.yearsOfExperience && errors.yearsOfExperience}
+              onChange={handleYearsOfExperienceChange}
+              inputProps={{ min: 0, max: 25 }}
               sx={{ gridColumn: "span 1" }}
             />
             <TextField
@@ -264,13 +231,9 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="Description"
-
-
-              //value={values.description}
+              value={formData1.description}
               name="description"
               id="description"
-              //error={!!touched.description && !!errors.description}
-              //helperText={touched.description && errors.description}
               sx={{ gridColumn: "span 2" }}
             />
             <TextField
@@ -278,13 +241,9 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="Address Line 1"
-
-
-              //value={values.addressLine1}
+              value={formData1.addressLine1}
               name="addressLine1"
               id="addressLine1"
-              //error={!!touched.addressLine1 && !!errors.addressLine1}
-              //helperText={touched.addressLine1 && errors.addressLine1}
               sx={{ gridColumn: "span 2" }}
             />
             <TextField
@@ -292,13 +251,9 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="Address Line 2"
-
-
-              //value={values.addressLine2}
+              value={formData1.addressLine2}
               name="addressLine2"
               id="addressLine2"
-              //error={!!touched.addressLine2 && !!errors.addressLine2}
-              //helperText={touched.addressLine2 && errors.addressLine2}
               sx={{ gridColumn: "span 2" }}
             />
             <TextField
@@ -306,13 +261,9 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="City"
-
-
-              //value={values.city}
+              value={formData1.city}
               name="city"
               id="city"
-              //error={!!touched.city && !!errors.city}
-              //helperText={touched.city && errors.city}
               sx={{ gridColumn: "span 2" }}
             />
             <TextField
@@ -320,29 +271,26 @@ const InstallerForm = () => {
               variant="filled"
               type="text"
               label="Zip"
-
-
-              //value={values.zip}
+              value={formData1.zip}
               name="zip"
               id="zip"
-              //error={!!touched.zip && !!errors.zip}
-              //helperText={touched.zip && errors.zip}
               sx={{ gridColumn: "span 2" }}
             />
-            <TextField
-              fullWidth
-              variant="filled"
-              type="number"
-              label="Miles Distance"
-
-
-              //value={values.miles_distance}
-              name="miles_distance"
-              id="miles_distance"
-              //error={!!touched.miles_distance && !!errors.miles_distance}
-              //helperText={touched.miles_distance && errors.miles_distance}
-              sx={{ gridColumn: "span 2" }}
-            />
+            <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+              <InputLabel id="miles-distance-label">Miles Distance</InputLabel>
+              <Select
+                labelId="miles-distance-label"
+                id="miles-distance"
+                value={milesDistance}
+                onChange={handleMilesDistanceChange}
+              >
+                {[5, 10, 20, 30, 40, 50].map((distance) => (
+                  <MenuItem key={distance} value={distance}>
+                    {distance} miles
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Grid item xs={3} md={2}>
               <FormControl fullWidth>
                 <InputLabel id="state-select-label">State</InputLabel>
@@ -363,15 +311,15 @@ const InstallerForm = () => {
             </Grid>
 
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit"  style={{backgroundColor:"#F0DD5D" , padding:"8px"}} variant="contained">
+              <Button type="submit" style={{ backgroundColor: "#96D232", padding: "8px" }} variant="contained">
                 Submit and Continue
               </Button>
             </Box>
-
           </Box>
-        )}
 
+        )}
       </form>
+
       <form onSubmit={handleFormSubmit_02}
       >
         {tabIndex === 1 && (
@@ -394,7 +342,7 @@ const InstallerForm = () => {
               label="License Number"
 
 
-              //value={values.licenseNumber}
+              value={formData2.licenseNumber}
               name="licenseNumber"
               id="licenseNumber"
               //error={!!touched.licenseNumber && !!errors.licenseNumber}
@@ -405,6 +353,7 @@ const InstallerForm = () => {
               fullWidth
               variant="filled"
               type="date"
+              value={formData2.licenseExpirationDate}
               label={isDateActive ? "" : "License Expiration Date"}
               onBlur={handleDateBlur}
               onFocus={handleDateFocus}
@@ -426,6 +375,7 @@ const InstallerForm = () => {
               variant="filled"
               type="file"
               label={isFileActive ? "" : "Image License"}
+              
               onBlur={handleFileBlur}
               onFocus={handleFileFocus}
               name="imageLicense"
@@ -448,7 +398,7 @@ const InstallerForm = () => {
               label={isFileActive ? "" : "PDF License"}
 
 
-              //value={values.pdfLicense}
+              // value={formData2.pdfLicense}
               name="pdfLicense"
               id="pdfLicense"
               //error={!!touched.pdfLicense && !!errors.pdfLicense}
@@ -469,7 +419,7 @@ const InstallerForm = () => {
               label="Business Insurance Number"
 
 
-              //value={values.businessInsuranceNumber}
+              value={formData2.businessInsuranceNumber}
               name="businessInsuranceNumber"
               //error={!!touched.businessInsuranceNumber && !!errors.businessInsuranceNumber}
               //helperText={touched.businessInsuranceNumber && errors.businessInsuranceNumber}
@@ -482,7 +432,7 @@ const InstallerForm = () => {
               label="Business Insurance Company"
 
 
-              //value={values.businessInsuranceCompany}
+              value={formData2.businessInsuranceCompany}
               name="businessInsuranceCompany"
               id="businessInsuranceCompany"
               //error={!!touched.businessInsuranceCompany && !!errors.businessInsuranceCompany}
@@ -496,7 +446,7 @@ const InstallerForm = () => {
               label="Business Agent Phone Number"
 
 
-              //value={values.businessAgentPhoneNumber}
+              value={formData2.businessAgentPhoneNumber}
               name="businessAgentPhoneNumber"
               id="businessAgentPhoneNumber"
               //error={!!touched.businessAgentPhoneNumber && !!errors.businessAgentPhoneNumber}
@@ -510,7 +460,7 @@ const InstallerForm = () => {
               label="Business Policy Number"
 
 
-              //value={values.businessPolicyNumber}
+              value={formData2.businessPolicyNumber}
               name="businessPolicyNumber"
               id="businessPolicyNumber"
               //error={!!touched.businessPolicyNumber && !!errors.businessPolicyNumber}
@@ -524,7 +474,7 @@ const InstallerForm = () => {
               label={isDateActive ? "" : "Business Insurance Effective Start Date"}
 
 
-              //value={values.businessInsuranceEffectiveStartDate}
+              value={formData2.businessInsuranceEffectiveStartDate}
               name="businessInsuranceEffectiveStartDate"
               id="businessInsuranceEffectiveStartDate"
               //error={!!touched.businessInsuranceEffectiveStartDate && !!errors.businessInsuranceEffectiveStartDate}
@@ -547,7 +497,7 @@ const InstallerForm = () => {
               label={isDateActive ? "" : "Business Insurance Effective End Date"}
 
 
-              //value={values.businessInsuranceEffectiveEndDate}
+              value={formData2.businessInsuranceEffectiveEndDate}
               name="businessInsuranceEffectiveEndDate"
               id="businessInsuranceEffectiveEndDate"
               //error={!!touched.businessInsuranceEffectiveEndDate && !!errors.businessInsuranceEffectiveEndDate}
@@ -570,7 +520,7 @@ const InstallerForm = () => {
               label={isFileActive ? "" : "Image Business Insurance"}
 
 
-              //value={values.imageBusinessInsurance}
+              // value={formData2.imageBusinessInsurance||""}
               name="imageBusinessInsurance"
               id="imageBusinessInsurance"
               //error={!!touched.imageBusinessInsurance && !!errors.imageBusinessInsurance}
@@ -591,7 +541,7 @@ const InstallerForm = () => {
               label={isFileActive ? "" : "PDF Business Insurance"}
 
 
-              //value={values.pdfBusinessInsurance}
+              // value={formData2.pdfBusinessInsurance||""}
               name="pdfBusinessInsurance"
               id="pdfBusinessInsurance"
               //error={!!touched.pdfBusinessInsurance && !!errors.pdfBusinessInsurance}
@@ -612,7 +562,7 @@ const InstallerForm = () => {
               label="Bonding Certification Number"
 
 
-              //value={values.bondingCertificationNumber}
+              value={formData2.bondingCertificationNumber}
               name="bondingCertificationNumber"
               id="bondingCertificationNumber"
               //error={!!touched.bondingCertificationNumber && !!errors.bondingCertificationNumber}
@@ -626,7 +576,7 @@ const InstallerForm = () => {
               label="Bonding Company"
 
 
-              //value={values.bondingCompany}
+              value={formData2.bondingCompany}
               name="bondingCompany"
               id="bondingCompany"
               //error={!!touched.bondingCompany && !!errors.bondingCompany}
@@ -640,7 +590,7 @@ const InstallerForm = () => {
               label="Bonding Agent Phone Number"
 
 
-              //value={values.bondingAgentPhoneNumber}
+              value={formData2.bondingAgentPhoneNumber}
               name="bondingAgentPhoneNumber"
               id="bondingAgentPhoneNumber"
               //error={!!touched.bondingAgentPhoneNumber && !!errors.bondingAgentPhoneNumber}
@@ -652,14 +602,13 @@ const InstallerForm = () => {
               variant="filled"
               type="number"
               label="Bond Amount"
-
-
-              //value={values.bondAmount}
               name="bondAmount"
               id="bondAmount"
-              //error={!!touched.bondAmount && !!errors.bondAmount}
-              //helperText={touched.bondAmount && errors.bondAmount}
+              value={bondAmount}
+              onChange={handleBondAmountChange}
+              onBlur={handleBondAmountBlur}
               sx={{ gridColumn: "span 1" }}
+              inputProps={{ min: 10000 }}
             />
             <TextField
               fullWidth
@@ -668,7 +617,7 @@ const InstallerForm = () => {
               label={isDateActive ? "" : "Bonding Effective Start Date"}
 
 
-              //value={values.bondingEffectiveStartDate}
+              value={formData2.bondingEffectiveStartDate}
               name="bondingEffectiveStartDate"
               id="bondingEffectiveStartDate"
               //error={!!touched.bondingEffectiveStartDate && !!errors.bondingEffectiveStartDate}
@@ -691,7 +640,7 @@ const InstallerForm = () => {
               label={isDateActive ? "" : "Bonding Effective End Date"}
 
 
-              //value={values.bondingEffectiveEndDate}
+              value={formData2.bondingEffectiveEndDate}
               name="bondingEffectiveEndDate"
               id="bondingEffectiveEndDate"
               //error={!!touched.bondingEffectiveEndDate && !!errors.bondingEffectiveEndDate}
@@ -714,7 +663,7 @@ const InstallerForm = () => {
               label={isFileActive ? "" : "Image Bonding"}
 
 
-              //value={values.imageBonding}
+              // value={formData2.imageBonding||""}
               name="imageBonding"
               id="imageBonding"
               //error={!!touched.imageBonding && !!errors.imageBonding}
@@ -735,7 +684,7 @@ const InstallerForm = () => {
               label={isFileActive ? "" : "PDF Bonding"}
 
 
-              //value={values.pdfBonding}
+              // value={formData2.pdfBonding||""}
               name="pdfBonding"
               id="pdfBonding"
               //error={!!touched.pdfBonding && !!errors.pdfBonding}
@@ -750,7 +699,7 @@ const InstallerForm = () => {
               }}
             />
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" style={{backgroundColor:"#F0DD5D" , padding:"8px"}} variant="contained">
+              <Button type="submit" style={{ backgroundColor: "#96D232", padding: "8px" }} variant="contained">
                 Submit and Continue
               </Button>
             </Box>

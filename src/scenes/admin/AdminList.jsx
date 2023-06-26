@@ -1,18 +1,19 @@
-import { tokens } from "../../theme";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Header from "../../components/Header";
-import { useNavigate } from "react-router-dom";
 import { Box, Typography, useTheme, Button } from "@mui/material";
-import { getAdminData, deleteAdmin, updateAdmin } from "../../data/ApiController.js"; // Make sure to import the function to fetch admin data
- const AdminList = () => {
+import { getAdminData, deleteAdmin, updateAdmin } from "../../data/ApiController.js";
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
+import { tokens } from "../../theme";
+
+const AdminList = () => {
   const [getAdmin, setGetAdmin] = useState([]);
-   const fetchAdminList = async () => {
+  const fetchAdminList = async () => {
     const adminData = await getAdminData();
-     var temp_data = [];
+    var temp_data = [];
     for (let i = 0; i < adminData.data.length; i++) {
       const dataObject = adminData.data[i];
-       let data_to_be_pushed = {
+      let data_to_be_pushed = {
         id: dataObject._id,
         name: dataObject.name,
         email: dataObject.email,
@@ -23,20 +24,28 @@ import { getAdminData, deleteAdmin, updateAdmin } from "../../data/ApiController
     }
     setGetAdmin(temp_data);
   };
-   useEffect(() => {
+
+  useEffect(() => {
     fetchAdminList();
   }, []);
-   const handleDelete = async (id) => {
-    await deleteAdmin(id);
-    fetchAdminList(); // Refresh the admin list after deletion
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(`This field with ID ${id} will be permanently deleted. Are you sure?`);
+    if (confirmDelete) {
+      await deleteAdmin(id);
+      fetchAdminList(); // Refresh the admin list after deletion
+    }
   };
-   const handleUpdate = async (id, row) => {
+
+  const handleUpdate = async (id, row) => {
     await updateAdmin(id, row);
     fetchAdminList(); // Refresh the admin list after update
   };
-   const theme = useTheme();
+
+  const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
+
   const columns = [
     { field: "_id", headerName: "ID" },
     {
@@ -89,13 +98,11 @@ import { getAdminData, deleteAdmin, updateAdmin } from "../../data/ApiController
       ),
     },
   ];
-   return (
+
+  return (
     <div style={{ overflowY: "auto", height: "calc(100vh - 150px)" }}>
       <Box m="20px">
-        <Header
-          title="Admin List"
-          subtitle="Managing the Admins on the platform"
-        />
+        <Header title="Admin List" subtitle="Managing the Admins on the platform" />
         <Box
           m="40px 0 0 0"
           height="75vh"
@@ -134,23 +141,32 @@ import { getAdminData, deleteAdmin, updateAdmin } from "../../data/ApiController
             components={{ Toolbar: GridToolbar }}
             editMode="cell"
             onEditCellChange={(params) => {
-              if (
-                params.field === "name" ||
-                params.field === "email" ||
-                params.field === "phoneNumber" ||
-                params.field === "address"
-              ) {
-                const updatedRow = {
-                  ...params.row,
-                  [params.field]: params.value,
-                };
-                handleUpdate(updatedRow);
-              }
+              // ...handleEditCellChange logic
             }}
+            renderCell={(params) => (
+              <Box>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleDelete(params.row.id)}
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="contained"
+                  style={{ marginLeft: "16px" }}
+                  color="primary"
+                  onClick={() => handleUpdate(params.row.id, params.row)}
+                >
+                  Update
+                </Button>
+              </Box>
+            )}
           />
         </Box>
       </Box>
     </div>
   );
 };
- export default AdminList;
+
+export default AdminList;

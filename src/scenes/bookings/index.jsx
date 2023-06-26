@@ -138,7 +138,7 @@ const BookingForm = () => {
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={3} md={2}>
-            <FormControl fullWidth >
+            <FormControl fullWidth>
               <InputLabel id="service-select-label">Service</InputLabel>
               <Select
                 labelId="service-select-label"
@@ -148,6 +148,12 @@ const BookingForm = () => {
                   console.log(event.target.value);
                   setSelectedService(event.target.value);
                 }}
+                label="Service"
+                sx={{
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#000", // Adjust the color when the input is focused
+                  },
+                }}
               >
                 {serviceList.map((service) => (
                   <MenuItem key={service._id} value={service._id}>
@@ -156,6 +162,7 @@ const BookingForm = () => {
                 ))}
               </Select>
             </FormControl>
+
           </Grid>
           <Grid item xs={3} md={2}>
             <TextField
@@ -197,7 +204,8 @@ const BookingForm = () => {
             <TextField
               id="date"
               name="date"
-              label="Date"
+              type="date"
+             
               fullWidth
             />
           </Grid>

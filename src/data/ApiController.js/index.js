@@ -215,6 +215,18 @@ const getInstallerList = async () => {
     }
 }
 
+
+
+const getCountInstaller = async()=>{
+    try {
+        const response = await axios.get(`http://localhost:5000/api/installer`);
+        return response.data.length;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 const createInstaller = async (formData) => {
     try {
         const response = await axios.post(`http://localhost:5000/api/installer/`, formData);
@@ -280,6 +292,16 @@ const getBookingsList = async () => {
     try {
         const response = await axios.get(`http://localhost:5000/api/booking`);
         return response;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+const getBookingCount = async () => {
+    try {
+        const response = await axios.get(`http://localhost:5000/api/booking`);
+        return response.data.length;
     } catch (error) {
         console.log(error);
     }
@@ -388,27 +410,50 @@ const deleteInstaller = async (id) => {
 
 const updateInstaller = async (id, dataObject) => {
     try {
-        const dataToBePushed = {
-            id: dataObject._id,
-            firstName: dataObject.firstName,
-            email: dataObject.email,
-            state: dataObject.state,
-            zip: dataObject.zip,
-            Number_of_bookings: dataObject.Number_of_bookings,
-            ratingsAndReviews: dataObject.ratingsAndReviews,
-            services: dataObject.services
-
-        };
-
-        const response = await axios.put(`http://localhost:5000/api/installer/${id}`, dataToBePushed);
-        return response;
+      const dataToBePushed = {
+        id: dataObject._id,
+        shown_id: `RC-I-${dataObject._id}`,
+        firstName: dataObject.firstName,
+        lastName: dataObject.lastName,
+        companyName: dataObject.companyName,
+        email: dataObject.email,
+        password: dataObject.password,
+        phoneNumber: dataObject.phoneNumber,
+        yearsOfExperience: dataObject.yearsOfExperience,
+        description: dataObject.description,
+        addressLine1: dataObject.addressLine1,
+        addressLine2: dataObject.addressLine2,
+        city: dataObject.city,
+        zip: dataObject.zip,
+        miles_distance: dataObject.miles_distance,
+        state: dataObject.state,
+        licenseNumber: dataObject.licenseNumber,
+        licenseExpirationDate: dataObject.licenseExpirationDate,
+        businessInsuranceCompany: dataObject.businessInsuranceCompany,
+        businessInsuranceNumber: dataObject.businessInsuranceNumber,
+        businessAgentPhoneNumber: dataObject.businessAgentPhoneNumber,
+        businessPolicyNumber: dataObject.businessPolicyNumber,
+        businessInsuranceEffectiveStartDate: dataObject.businessInsuranceEffectiveStartDate,
+        businessInsuranceEffectiveEndDate: dataObject.businessInsuranceEffectiveEndDate,
+        bondingCertificationNumber: dataObject.bondingCertificationNumber,
+        bondingCompany: dataObject.bondingCompany,
+        bondingAgentPhoneNumber: dataObject.bondingAgentPhoneNumber,
+        bondAmount: dataObject.bondAmount,
+        bondingEffectiveStartDate: dataObject.bondingEffectiveStartDate,
+        bondingEffectiveEndDate: dataObject.bondingEffectiveEndDate,
+        services: dataObject.services
+      };
+  
+      const response = await axios.put(`http://localhost:5000/api/installer/${id}`, dataToBePushed);
+      return response;
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-}
+  };
+  
 
 
 
 
 
-export { getAdminData, deleteAdmin, updateAdmin, deleteInstaller,updateInstaller, createService, createTime, getserviceList, getServiceNameById, getserviceTimeList, deleteServiceTimeById, createServicePrice, getServicePriceList, deleteServicePrice, createMaterial, deleteMaterialById, getMaterialList, getMaterialTax, createMaterialTax, getLabourRate, createLabourRate, deleteLabourRate, getInstallerList, createInstaller, getMostSuitableInstaller, createBooking, createAdmin, validateAdmin, getLabourRateByServiceId, getBookingsList, deleteBooking, updateBooking }
+export { getBookingCount,getCountInstaller,getAdminData, deleteAdmin, updateAdmin, deleteInstaller,updateInstaller, createService, createTime, getserviceList, getServiceNameById, getserviceTimeList, deleteServiceTimeById, createServicePrice, getServicePriceList, deleteServicePrice, createMaterial, deleteMaterialById, getMaterialList, getMaterialTax, createMaterialTax, getLabourRate, createLabourRate, deleteLabourRate, getInstallerList, createInstaller, getMostSuitableInstaller, createBooking, createAdmin, validateAdmin, getLabourRateByServiceId, getBookingsList, deleteBooking, updateBooking }
