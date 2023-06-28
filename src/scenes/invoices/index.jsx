@@ -1,35 +1,42 @@
+import React, { useState, useEffect } from "react";
 import { Box, Button } from "@mui/material";
 import Header from "../../components/Header";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useTheme } from "@mui/material";
 import { tokens } from "../../theme";
-import { useState ,useEffect} from "react";
-import { getBookingsList,getServiceNameById,deleteBooking,updateBooking } from "../../data/ApiController.js";
+import {
+  getBookingsList,
+  getServiceNameById,
+  deleteBooking,
+  updateBooking,
+} from "../../data/ApiController.js";
 
-const BookingTable = ({  }) => {
-  const [bookingList,setBookingList] = useState([]);
+const BookingTable = () => {
+  const [bookingList, setBookingList] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  useEffect( () => {
-       FetchData();
-  }, [])
-  
-  const FetchData = async () => {
-    try {   
-        const callDataObject = await getBookingsList();
-        const tempData=[]
-        for (const index in callDataObject.data) {
-        const dataObject = callDataObject.data[index]
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const callDataObject = await getBookingsList();
+      const tempData = [];
+      for (const index in callDataObject.data) {
+        const dataObject = callDataObject.data[index];
+        console.log(dataObject)
         const serviceName = await getServiceNameById(dataObject.service);
         const materials = [];
-        for(const i in dataObject.material_details) { 
+        for (const i in dataObject.material_details) {
           materials.push(dataObject.material_details[i]);
           console.log(dataObject.material_details[i]);
         }
-     
+
         const dataToBePushed = {
-          id: `RC-TOK-${dataObject._id}`,
+          id: `${dataObject._id}`,
+          shown_id: `RC-TOK-${dataObject._id}`,
           date: dataObject.date,
           time_start: dataObject.time_start,
           time_end: dataObject.time_end,
@@ -40,48 +47,63 @@ const BookingTable = ({  }) => {
           customerShowingCost: dataObject.customerShowingCost,
           paymentStatus: dataObject.paymentStatus,
           completionStatus: dataObject.completionStatus,
-          installer:`RC-I-${dataObject.installer}`,
+          installer: `${dataObject.installer}`,
+          shown_installer: `RC-I-${dataObject.installer}`,
           service: serviceName,
-          service_id:dataObject.service,
+          service_id: dataObject.service,
           machinePurchasedByUser: dataObject.machinePurchasedByUser,
           labourRates: dataObject.labourRates,
+          changedBy:dataObject.changedBy
         };
-        tempData.push(dataToBePushed)}
+        tempData.push(dataToBePushed);
+      }
       setBookingList(tempData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      `This field with ID ${id} will be permanently deleted. Are you sure?`
+    );
+    if (confirmDelete) {
+      await deleteBooking(id);
+      fetchData(); // Refresh the bookings list after deletion
+    }
+  };
+
+  const handleRowUpdate = async (params) => {
+    const { id, field, value } = params;
+    const updatedRow = {
+      ...params.row,
+      [field]: value,
+    };
+  
+    try {
+      await updateBooking(id, updatedRow);
+      const updatedBookingList = bookingList.map((booking) =>
+        booking.id === id ? updatedRow : booking
+      );
+      setBookingList([...updatedBookingList]);
     } catch (error) {
       console.log(error);
     }
   };
   
 
-
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(`This field with ID ${id} will be permanently deleted. Are you sure?`);
-    if (confirmDelete) {
-      await deleteBooking(id);
-      FetchData(); // Refresh the bookings list after deletion
-    }
-  };
-
-  const handleUpdate = async (id,row) => {
-    await updateBooking(id,row);
-    FetchData(); // Refresh the bookings list after update
-  };
-
   const columns = [
-    { field: "id", headerName: "ID", width: 100 },
+    { field: "shown_id", headerName: "ID", width: 100 },
     { field: "date", headerName: "Date", width: 200, editable: true },
     { field: "time_start", headerName: "Start Time", width: 150, editable: true },
     { field: "time_end", headerName: "End Time", width: 150, editable: true },
-    { field: "number_of_installs", headerName: "Number of Installs", width: 200, },
-    { field: "materialCost", headerName: "Material Cost", width: 200,  },
-    { field: "materialTax", headerName: "Material Tax", width: 200,  },
+    { field: "number_of_installs", headerName: "Number of Installs", width: 200 },
+    { field: "materialCost", headerName: "Material Cost", width: 200 },
     { field: "material_details", headerName: "Material Details", width: 400 },
-    { field: "customerShowingCost", headerName: "Customer Showing Cost", width: 250,  },
+    { field: "customerShowingCost", headerName: "Customer Showing Cost", width: 250 },
     { field: "paymentStatus", headerName: "Payment Status", width: 200 },
     { field: "completionStatus", headerName: "Completion Status", width: 200 },
-    { field: "installer", headerName: "Installer", width: 200 },
+    { field: "shown_installer", headerName: "Installer", width: 200 },
     { field: "service", headerName: "Service", width: 200 },
     { field: "machinePurchasedByUser", headerName: "Machine Purchased By User", width: 250 },
     { field: "labourRates", headerName: "Labour Rates", width: 200 },
@@ -91,23 +113,32 @@ const BookingTable = ({  }) => {
       width: 200,
       renderCell: (params) => (
         <Box>
-          <Button variant="contained" color="secondary" onClick={() => handleDelete(params.row.id)}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleDelete(params.row.id)}
+          >
             Delete
           </Button>
-          <Button variant="contained" style={{marginLeft:"16px"}} color="primary" onClick={() => handleUpdate(params.row.id , params.row)}>
+          <Button
+            variant="contained"
+            style={{ marginLeft: "16px" }}
+            color="primary"
+            onClick={() => handleRowUpdate(params)}
+          >
             Update
           </Button>
         </Box>
       ),
     },
+    { field: "changedBy",headerName: "Changed By",width:400},
+    
+    
   ];
 
   return (
     <Box m="20px">
-       <Header
-          title="Tickets List"
-          subtitle="Managing the Bookings on the platform"
-        />
+      <Header title="Tickets List" subtitle="Managing the Bookings on the platform" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -144,24 +175,8 @@ const BookingTable = ({  }) => {
           rows={bookingList}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
-          editMode="cell"
-          onEditCellChange={(params) => {
-            if (
-              params.field === "date" ||
-              params.field === "time_start" ||
-              params.field === "time_end" ||
-              params.field === "number_of_installs" ||
-              params.field === "materialCost" ||
-              params.field === "materialTax" ||
-              params.field === "customerShowingCost"
-            ) {
-              const updatedRow = {
-                ...params.row,
-                [params.field]: params.value,
-              };
-              handleUpdate(updatedRow);
-            }
-          }}
+          editMode="row"
+          onEditCellChange={handleRowUpdate}
           // Add other DataGrid props as needed
         />
       </Box>

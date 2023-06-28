@@ -20,42 +20,44 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
+
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import { AdminPanelSettingsRounded, DashboardCustomizeRounded } from "@mui/icons-material";
-const fixed_username= 'johndoe@example.com'
-const Item = ({ title, to, icon, selected, setSelected, isLoggedIn, username }) => {
+
+const fixed_username = 'Brian@readicharge.com';
+
+const Item = ({ title, to, icon, selected, setSelected, isLoggedIn, username, enabled }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
- 
+
   const isSectionEnabled = () => {
     if (!isLoggedIn) {
       return false;
     }
-    
-    // Replace 'YOUR_FIXED_USERNAME' with the fixed username you want to check against
+  
     if (username === fixed_username) {
       return true; // Enable all sections for the fixed username
     }
+  
     
-    // Disable other sections if it's not the fixed username
-    return false;
+    const lowercaseTitle = title.toLowerCase();
+    console.log(enabled.some((role) => lowercaseTitle.includes(role.toLowerCase())))
+    // Enable the section if any role from the roles list is present in the lowercase title
+    return enabled.some((role) => lowercaseTitle.includes(role.toLowerCase()));
   };
+  
 
   return (
     <MenuItem
       active={selected === title}
       style={{
         color: colors.grey[200],
-        backgroundColor:selected === title ? "#94d034":"inherit",
-        marginLeft:"-25px",
+        backgroundColor: selected === title ? "#94d034" : "inherit",
+        marginLeft: "-25px",
         borderTopRightRadius: selected === title ? "23px" : 0,
-        borderBottomRightRadius:selected === title ? "23px" :0,
+        borderBottomRightRadius: selected === title ? "23px" : 0,
         pointerEvents: isSectionEnabled() ? "auto" : "none",
         opacity: isSectionEnabled() ? 1 : 0.5,
       }}
@@ -68,8 +70,8 @@ const Item = ({ title, to, icon, selected, setSelected, isLoggedIn, username }) 
   );
 };
 
-const Sidebar = ({  username  ,isLoggedIn}) => {
-  
+const Sidebar = ({ username, isLoggedIn, enabledSections }) => {
+  console.log(enabledSections)
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -125,15 +127,17 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
 
           {!isCollapsed && (
             <Box mb="25px">
-             { username===fixed_username && <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>}
+              {username === fixed_username && (
+                <Box display="flex" justifyContent="center" alignItems="center">
+                  <img
+                    alt="profile-user"
+                    width="100px"
+                    height="100px"
+                    src={`../../assets/user.png`}
+                    style={{ cursor: "pointer", borderRadius: "50%" }}
+                  />
+                </Box>
+              )}
               <Box textAlign="center">
                 <Typography
                   variant="h4"
@@ -143,13 +147,15 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
                 >
                   {username}
                 </Typography>
-                { username===fixed_username ?
-               ( <Typography variant="h5" color={colors.grey[500]}>
-               Super Admin
-             </Typography>):( <Typography variant="h5" color={colors.grey[500]}>
-                  Sub  Admin
-                </Typography>)
-}
+                {username === fixed_username ? (
+                  <Typography variant="h5" color={colors.grey[500]}>
+                    Super Admin
+                  </Typography>
+                ) : (
+                  <Typography variant="h5" color={colors.grey[500]}>
+                    Sub Admin
+                  </Typography>
+                )}
               </Box>
             </Box>
           )}
@@ -161,8 +167,9 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               icon={<ViewQuiltOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
 
             <Typography
@@ -178,8 +185,9 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               icon={<PermIdentityOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Customers"
@@ -187,8 +195,9 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               icon={<PermIdentityOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Admins"
@@ -198,6 +207,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Companies"
@@ -205,17 +215,19 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               icon={<BusinessOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Job Tickets"
               to="/jobs"
-              icon={<DescriptionOutlinedIcon />}
               selected={selected}
+              icon={<BusinessOutlinedIcon />}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
 
             <Typography
@@ -231,17 +243,19 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Customer"
-              to="/customerForm"
+              to="/under-progress"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Job Ticket"
@@ -249,8 +263,9 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               icon={<NoteAddOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isLoggedIn={true}
-              username={fixed_username}
+              isLoggedIn={isLoggedIn}
+              username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Admin Users"
@@ -260,6 +275,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
 
             <Typography
@@ -277,6 +293,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Time Per Service"
@@ -286,6 +303,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Service Price"
@@ -295,6 +313,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Manage Materials"
@@ -304,6 +323,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Manage Material Tax"
@@ -313,6 +333,7 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
             <Item
               title="Manage Labour Rates"
@@ -322,8 +343,8 @@ const Sidebar = ({  username  ,isLoggedIn}) => {
               setSelected={setSelected}
               isLoggedIn={isLoggedIn}
               username={username}
+              enabled={enabledSections}
             />
-
           </Box>
         </Menu>
       </ProSidebar>

@@ -4,7 +4,7 @@ import { Box, TextField, Button, Typography, Container } from '@mui/material';
 import { validateAdmin } from '../../data/ApiController.js'; 
 import { useNavigate } from 'react-router-dom'; 
  
-const LoginScreen = ({ onLogin, setUserName }) => { 
+const LoginScreen = ({ onLogin, setUserName , setRoles}) => { 
   const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState(''); 
   const [error, setError] = useState(''); 
@@ -29,6 +29,8 @@ const LoginScreen = ({ onLogin, setUserName }) => {
     if (response.data.valid) { 
       onLogin(true); 
       setUserName(email); 
+      console.log(response.data.roles)
+      setRoles(response.data.roles)
       // navigate('/dashboard'); // Redirect to the dashboard upon successful login 
     } else { 
       setError('Invalid email or password'); 

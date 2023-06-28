@@ -22,7 +22,7 @@ import { deleteServiceTimeById } from "../../data/ApiController.js";
     setServiceTime(serviceTime.filter((st) => st.id !== id));
   };
   const columns = [
-    { field: "id", headerName: "ID", width: 100 },
+    { field: "shown_id", headerName: "ID", width: 100 },
     { field: "service_name", headerName: "Service", width: 100 },
     { field: "number_of_installs", headerName: "Number of Installs", width: 100 },
     { field: "time_min", headerName: "Minimum Time", width: 100 },
@@ -34,7 +34,7 @@ import { deleteServiceTimeById } from "../../data/ApiController.js";
       renderCell: (params) => (
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={() => handleDelete(params.row.id)}
         >
           Delete
@@ -56,7 +56,7 @@ import { deleteServiceTimeById } from "../../data/ApiController.js";
             borderBottom: "none",
           },
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            color: "#141E5A",
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "#94d034",
@@ -73,7 +73,7 @@ import { deleteServiceTimeById } from "../../data/ApiController.js";
             color: `${colors.greenAccent[700]} !important`,
           },
           "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[400]} !important`,
+            color: `#141E5A !important`,
           },
         }}
       >

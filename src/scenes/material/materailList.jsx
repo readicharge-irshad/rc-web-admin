@@ -25,7 +25,7 @@ import { deleteMaterialById } from "../../data/ApiController.js";
     setMaterial(material.filter((st) => st.id !== id));
   };
   const columns = [
-    { field: "id", headerName: "ID", width: 100 },
+    { field: "shown_id", headerName: "ID", width: 100 },
     { field: "material_name", headerName: "Material Name", width: 100 },
     { field: "material_desc", headerName: "Material Description", width: 100 },
     { field: "service_name", headerName: "Service", width: 100 },
@@ -38,7 +38,7 @@ import { deleteMaterialById } from "../../data/ApiController.js";
       renderCell: (params) => (
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={() => handleDelete(params.row.id)}
         >
           Delete
@@ -77,7 +77,7 @@ import { deleteMaterialById } from "../../data/ApiController.js";
             color: `${colors.greenAccent[700]} !important`,
           },
           "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[400]} !important`,
+            color: `#141E5A !important`,
           },
         }}
       >

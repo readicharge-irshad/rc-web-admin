@@ -181,11 +181,11 @@ const CustomerDetails = ({ setOtherData, data }) => {
               label="Select Material"
               value={selectedMaterial}
               onChange={handleMaterialChange}
-              sm={12}
+              sx={{minWidth:"120px"}}
              
             >
               {materialList.map((material) => (
-                <MenuItem key={material.id} value={material.id}>
+                <MenuItem key={material.id} value={material.id} >
                   {material.material_name}
                 </MenuItem>
               ))}
@@ -222,7 +222,7 @@ const CustomerDetails = ({ setOtherData, data }) => {
               select
               value={numOfInstalls}
               onChange={handleNumOfInstallsChange}
-              sx={{ marginLeft: '10px' }}
+              sx={{ marginLeft: '10px' , minWidth:"120px"}}
             >
               <MenuItem value={1}>1</MenuItem>
               <MenuItem value={2}>2</MenuItem>

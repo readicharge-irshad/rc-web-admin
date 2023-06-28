@@ -384,7 +384,8 @@ const updateAdmin = async (id, dataObject) => {
             email: dataObject.email,
             phoneNumber: dataObject.phoneNumber,
             address: dataObject.address,
-            password: dataObject.password
+            password: dataObject.password,
+            roles:dataObject.roles
 
         };
 
@@ -445,6 +446,7 @@ const updateInstaller = async (id, dataObject) => {
       };
   
       const response = await axios.put(`http://localhost:5000/api/installer/${id}`, dataToBePushed);
+      console.log(response)
       return response;
     } catch (error) {
       console.log(error);

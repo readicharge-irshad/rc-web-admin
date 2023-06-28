@@ -26,7 +26,8 @@ import { getserviceTimeList,getServiceNameById } from "../../data/ApiController.
       const dataObject = data.data[i];
     
         let data_to_be_pushed = {
-          id : `RC-SETM-${dataObject._id}`,
+          id:dataObject._id,
+          shown_id : `RC-SETM-${dataObject._id}`,
           service_name: await getServiceNameById(dataObject.service_id),
           number_of_installs : dataObject.number_of_installs,
           time_min : dataObject.time_min,
@@ -76,24 +77,31 @@ import { getserviceTimeList,getServiceNameById } from "../../data/ApiController.
         <Grid spacing={2}>
           <Grid item>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <FormControl sx={{ minWidth: 120, marginLeft: '20px' }}>
-                <InputLabel id="service-select-label">Service</InputLabel>
-                <Select
-                  labelId="service-select-label"
-                  id="service-select"
-                  value={selectedService._id}
-                  onChange={(event) => {
-                    console.log(event.target.value);
-                    setSelectedService(event.target.value);
-                  }}
-                >
-                  {serviceList.map((service) => (
-                    <MenuItem key={service._id} value={service._id}>
-                      {service.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            <FormControl sx={{marginLeft:"20px",minWidth:"120px"}}>
+              <InputLabel id="service-select-label">Service</InputLabel>
+              <Select
+                labelId="service-select-label"
+                id="service-select"
+                value={selectedService._id}
+                onChange={(event) => {
+                  console.log(event.target.value);
+                  setSelectedService(event.target.value);
+                }}
+                label="Service"
+                sx={{
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#000", // Adjust the color when the input is focused
+                  },
+                }}
+              >
+                {serviceList.map((service) => (
+                  <MenuItem key={service._id} value={service._id}>
+                    {service.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
               <TextField
                 id="numberOfInstall"
                 name="numberOfInstall"

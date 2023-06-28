@@ -20,7 +20,7 @@ import { deleteServicePrice } from "../../data/ApiController.js";
     setServicePrice(servicePrice.filter((st) => st.id !== id));
   };
   const columns = [
-    { field: "id", headerName: "ID", width: 100 },
+    { field: "shown_id", headerName: "ID", width: 100 },
     { field: "service_name", headerName: "Service", width: 200 },
     { field: "number_of_installs", headerName: "Number of Installs", width: 400 },
     { field: "price", headerName: "Price", width: 200 },
@@ -31,7 +31,7 @@ import { deleteServicePrice } from "../../data/ApiController.js";
       renderCell: (params) => (
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={() => handleDelete(params.row.id)}
         >
           Delete
@@ -70,7 +70,7 @@ import { deleteServicePrice } from "../../data/ApiController.js";
             color: `${colors.greenAccent[700]} !important`,
           },
           "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[400]} !important`,
+            color: `#141E5A !important`,
           },
         }}
       >

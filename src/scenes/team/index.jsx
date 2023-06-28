@@ -21,8 +21,9 @@ const formatDate = (date) => {
 };
 
 const handleUpdate = async (id, row) => {
-  await updateInstaller(id, row);
-  alert("done")
+  console.log(row)
+  const response = await updateInstaller(id, row);
+  if(response.status===200) alert("done")
   getInstallerList(); // Refresh the installer list after update
 };
 
@@ -133,7 +134,8 @@ const InstallerList = () => {
         bondAmount: dataObject.bondAmount,
         bondingEffectiveStartDate: dataObject.bondingEffectiveStartDate,
         bondingEffectiveEndDate: dataObject.bondingEffectiveEndDate,
-        services: dataObject.services
+        services: dataObject.services,
+        changedBy:dataObject.changedBy
       };
 
       temp_data.push(data_to_be_pushed);
@@ -177,8 +179,9 @@ const InstallerList = () => {
       setPieData(pieData);
     }
   }, [getInstaller]);
+  
 
-  const handleOpenModal =  (installer) => {
+  const handleOpenModal = (installer) => {
     console.log(installer)
     setSelectedInstaller(installer);
     setIsModalOpen(true);
@@ -213,13 +216,13 @@ const InstallerList = () => {
       headerName: "State",
       headerAlign: "left",
       align: "left",
-      editable: true, // Make this cell editable
+       // Make this cell editable
     },
     {
       field: "zip",
       headerName: "Zip Code",
       flex: 1,
-      editable: true, // Make this cell editable
+       // Make this cell editable
     },
     {
       field: "Number_of_bookings",
@@ -236,13 +239,13 @@ const InstallerList = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 300,
+      width: 350,
 
       renderCell: (params) => (
         <Box>
           <Button
             variant="contained"
-            color="secondary"
+            color="primary"
             onClick={() => handleDelete(params.row.id)}
           >
             Delete
@@ -261,11 +264,18 @@ const InstallerList = () => {
             color="primary"
             onClick={() => handleOpenModal(params.row)}
           >
-            View Details
+            Edit Details
           </Button>
         </Box>
       ),
 
+    },
+    {
+      field: "changedBy",
+      headerName: "Change Log",
+      flex: 1,
+     
+      // Make this cell editable
     },
   ];
 
@@ -275,7 +285,7 @@ const InstallerList = () => {
     );
     if (confirmDelete) {
       await deleteInstaller(id);
-      fetchData(); // Refresh the bookings list after deletion
+      fetchInstallerList(); // Refresh the bookings list after deletion
     }
   };
 
@@ -406,9 +416,13 @@ const InstallerDetailsModal = ({
   isModalOpen,
   handleUpdate,
 }) => {
-  if (!selectedInstaller) return null;
+  const [formData, setFormData] = useState(null);
 
-  const [formData, setFormData] = useState(selectedInstaller);
+  useEffect(() => {
+    if (selectedInstaller) {
+      setFormData(selectedInstaller);
+    }
+  }, [selectedInstaller]);
 
   const handleFieldChange = (event) => {
     const { name, value } = event.target;
@@ -418,281 +432,285 @@ const InstallerDetailsModal = ({
     }));
   };
 
+  if (!formData) {
+    return null; // You can render a loading spinner or placeholder while waiting for selectedInstaller data
+  }
+
   return (
 
 
-    <Dialog open={isModalOpen} onClose={handleCloseModal}>
-      <DialogTitle>Installer Details</DialogTitle>
-      <DialogContent>
-        <Box>
-          <TextField
-            name="user_id"
-            label="User ID"
-            value={formData.user_id}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="firstName"
-            label="First Name"
-            value={formData.firstName}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="lastName"
-            label="Last Name"
-            value={formData.lastName}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="companyName"
-            label="Company Name"
-            value={formData.companyName}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="email"
-            label="Email"
-            value={formData.email}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="password"
-            label="Password"
-            type="password"
-            value={formData.password}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="phoneNumber"
-            label="Phone Number"
-            value={formData.phoneNumber}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="yearsOfExperience"
-            label="Years of Experience"
-            type="number"
-            value={formData.yearsOfExperience}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="description"
-            label="Description"
-            value={formData.description}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-            multiline
-            rows={4}
-          />
-          <TextField
-            name="addressLine1"
-            label="Address Line 1"
-            value={formData.addressLine1}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="addressLine2"
-            label="Address Line 2"
-            value={formData.addressLine2}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="city"
-            label="City"
-            value={formData.city}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="zip"
-            label="ZIP"
-            value={formData.zip}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="miles_distance"
-            label="Miles Distance"
-            type="number"
-            value={formData.miles_distance}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="state"
-            label="State"
-            value={formData.state}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="licenseNumber"
-            label="License Number"
-            value={formData.licenseNumber}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="licenseExpirationDate"
-            label="License Expiration Date"
-            type="date"
-            value={formatDate(formData.licenseExpirationDate)}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <TextField
-            name="businessInsuranceCompany"
-            label="Business Insurance Company"
-            value={formData.businessInsuranceCompany}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="businessInsuranceNumber"
-            label="Business Insurance Number"
-            value={formData.businessInsuranceNumber}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="businessAgentPhoneNumber"
-            label="Business Agent Phone Number"
-            value={formData.businessAgentPhoneNumber}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="businessPolicyNumber"
-            label="Business Policy Number"
-            value={formData.businessPolicyNumber}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="businessInsuranceEffectiveStartDate"
-            label="Business Insurance Effective Start Date"
-            type="date"
-            value={formatDate(formData.businessInsuranceEffectiveStartDate)}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <TextField
-            name="businessInsuranceEffectiveEndDate"
-            label="Business Insurance Effective End Date"
-            type="date"
-            value={formatDate(formData.businessInsuranceEffectiveEndDate)}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
+<Dialog open={isModalOpen} onClose={handleCloseModal}>
+  <DialogTitle>Installer Details</DialogTitle>
+  <DialogContent>
+    <Box>
+      <TextField
+        name="shown_id"
+        label="User ID"
+        value={formData.shown_id || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="firstName"
+        label="First Name"
+        value={formData.firstName || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="lastName"
+        label="Last Name"
+        value={formData.lastName || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="companyName"
+        label="Company Name"
+        value={formData.companyName || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="email"
+        label="Email"
+        value={formData.email || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="password"
+        label="Password"
+        type="password"
+        value={formData.password || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="phoneNumber"
+        label="Phone Number"
+        value={formData.phoneNumber || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="yearsOfExperience"
+        label="Years of Experience"
+        type="number"
+        value={formData.yearsOfExperience || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="description"
+        label="Description"
+        value={formData.description || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+        multiline
+        rows={4}
+      />
+      <TextField
+        name="addressLine1"
+        label="Address Line 1"
+        value={formData.addressLine1 || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="addressLine2"
+        label="Address Line 2"
+        value={formData.addressLine2 || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="city"
+        label="City"
+        value={formData.city || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="zip"
+        label="ZIP"
+        value={formData.zip || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="miles_distance"
+        label="Miles Distance"
+        type="number"
+        value={formData.miles_distance || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="state"
+        label="State"
+        value={formData.state || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="licenseNumber"
+        label="License Number"
+        value={formData.licenseNumber || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="licenseExpirationDate"
+        label="License Expiration Date"
+        type="date"
+        value={formatDate(formData.licenseExpirationDate) || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+      <TextField
+        name="businessInsuranceCompany"
+        label="Business Insurance Company"
+        value={formData.businessInsuranceCompany || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="businessInsuranceNumber"
+        label="Business Insurance Number"
+        value={formData.businessInsuranceNumber || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="businessAgentPhoneNumber"
+        label="Business Agent Phone Number"
+        value={formData.businessAgentPhoneNumber || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="businessPolicyNumber"
+        label="Business Policy Number"
+        value={formData.businessPolicyNumber || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="businessInsuranceEffectiveStartDate"
+        label="Business Insurance Effective Start Date"
+        type="date"
+        value={formatDate(formData.businessInsuranceEffectiveStartDate) || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+      <TextField
+        name="businessInsuranceEffectiveEndDate"
+        label="Business Insurance Effective End Date"
+        type="date"
+        value={formatDate(formData.businessInsuranceEffectiveEndDate) || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+      <TextField
+        name="bondingCertificationNumber"
+        label="Bonding Certification Number"
+        value={formData.bondingCertificationNumber || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="bondingCompany"
+        label="Bonding Company"
+        value={formData.bondingCompany || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="bondingAgentPhoneNumber"
+        label="Bonding Agent Phone Number"
+        value={formData.bondingAgentPhoneNumber || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="bondAmount"
+        label="Bond Amount"
+        type="number"
+        value={formData.bondAmount || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        name="bondingEffectiveStartDate"
+        label="Bonding Effective Start Date"
+        type="date"
+        value={formData.bondingEffectiveStartDate || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+      <TextField
+        name="bondingEffectiveEndDate"
+        label="Bonding Effective End Date"
+        type="date"
+        value={formData.bondingEffectiveEndDate || ""}
+        onChange={handleFieldChange}
+        fullWidth
+        margin="normal"
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+    </Box>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleCloseModal}>Close</Button>
+    <Button onClick={() => handleUpdate(selectedInstaller.id, formData)}>
+      Update and Save
+    </Button>
+  </DialogActions>
+</Dialog>
 
-          <TextField
-            name="bondingCertificationNumber"
-            label="Bonding Certification Number"
-            value={formData.bondingCertificationNumber}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="bondingCompany"
-            label="Bonding Company"
-            value={formData.bondingCompany}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="bondingAgentPhoneNumber"
-            label="Bonding Agent Phone Number"
-            value={formData.bondingAgentPhoneNumber}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="bondAmount"
-            label="Bond Amount"
-            type="number"
-            value={formData.bondAmount}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            name="bondingEffectiveStartDate"
-            label="Bonding Effective Start Date"
-            type="date"
-            value={formData.bondingEffectiveStartDate}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <TextField
-            name="bondingEffectiveEndDate"
-            label="Bonding Effective End Date"
-            type="date"
-            value={formData.bondingEffectiveEndDate}
-            onChange={handleFieldChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseModal}>Close</Button>
-        <Button onClick={() => handleUpdate(selectedInstaller.id, formData)}>
-          Update and Save
-        </Button>
-      </DialogActions>
-    </Dialog>
 
   );
 };

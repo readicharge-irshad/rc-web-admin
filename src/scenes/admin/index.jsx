@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Button, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -9,10 +9,11 @@ import { createAdmin } from '../../data/ApiController.js';
 const AdminForm = () => {
   const isNonMobile = useMediaQuery('(min-width:600px)');
 
+  const [selectedRoles, setSelectedRoles] = useState([]);
+
   const handleFormSubmit = (values) => {
-    console.log(values)
-    createAdmin(values);
-   
+    const adminData = { ...values, roles: selectedRoles };
+    createAdmin(adminData);
   };
 
   const checkoutSchema = yup.object().shape({
@@ -29,6 +30,15 @@ const AdminForm = () => {
     email: '',
     address: '',
     phoneNumber: '',
+  };
+
+  const handleRoleChange = (event) => {
+    const { value, checked } = event.target;
+    if (checked) {
+      setSelectedRoles((prevRoles) => [...prevRoles, value]);
+    } else {
+      setSelectedRoles((prevRoles) => prevRoles.filter((role) => role !== value));
+    }
   };
 
   return (
@@ -56,6 +66,10 @@ const AdminForm = () => {
               sx={{
                 '& > div': { gridColumn: isNonMobile ? undefined : 'span 2' },
               }}
+              bgcolor="#f5f5f5"
+              borderRadius="10px"
+              padding="20px"
+              boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
             >
               <TextField
                 fullWidth
@@ -117,9 +131,61 @@ const AdminForm = () => {
                 error={!!touched.phoneNumber && !!errors.phoneNumber}
                 helperText={touched.phoneNumber && errors.phoneNumber}
               />
+              <Box>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedRoles.includes('Installer')}
+                      onChange={handleRoleChange}
+                      value="Installer"
+                    />
+                  }
+                  label="Installer"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedRoles.includes('Customer')}
+                      onChange={handleRoleChange}
+                      value="Customer"
+                    />
+                  }
+                  label="Customer"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedRoles.includes('Service')}
+                      onChange={handleRoleChange}
+                      value="Service"
+                    />
+                  }
+                  label="Service"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedRoles.includes('Material')}
+                      onChange={handleRoleChange}
+                      value="Material"
+                    />
+                  }
+                  label="Material"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedRoles.includes('Payments')}
+                      onChange={handleRoleChange}
+                      value="Payments"
+                    />
+                  }
+                  label="Payments"
+                />
+              </Box>
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+            <Box display="flex" mt="20px">
+              <Button type="submit" color="primary" variant="contained">
                 Save Admin Details
               </Button>
             </Box>

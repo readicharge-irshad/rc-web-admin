@@ -15,9 +15,10 @@ import {
 import { createBooking, getMaterialTax, getMostSuitableInstaller, getserviceList } from "../../data/ApiController.js";
 import InstallerDetails from "./mappedInstaller.jsx";
 import CustomerDetails from "./otherDetails.jsx";
+import Header from "../../components/Header.jsx";
 
 
-const BookingForm = () => {
+const BookingForm = ({admin}) => {
   const [serviceList, setServiceList] = useState([]);
   const [selectedService, setSelectedService] = useState('');
   const [numberOfInstalls, setNumberOfInstalls] = useState('');
@@ -124,14 +125,28 @@ const BookingForm = () => {
       completionStatus: false,
       number_of_installs: parseInt(numberOfInstall),
       material_details: material_details,
-      material_tax_id: materialTaxId
+      material_tax_id: materialTaxId,
+      changedBy:admin
     };
 
     createBooking(newObject);
   }
 
   return (
-    <Box m="50px" style={{ overflowY: 'auto', height: 'calc(100vh - 150px)', }}>
+ <Box style={{paddingLeft:"30px"}}>
+    <Header title="Book A Ticket" subtitle="Create a New Ticket for the Installation"  />
+    <Box
+      m="50px"
+      style={{
+        overflowY: "auto",
+        height: "calc(100vh - 150px)",
+        background: "linear-gradient(to bottom, #f5f5f5, #FFFFFF)",
+        borderRadius: "10px",
+        padding: "20px",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      
       <Typography variant="h5" my="20px">
         Primary Details
       </Typography>
@@ -162,7 +177,6 @@ const BookingForm = () => {
                 ))}
               </Select>
             </FormControl>
-
           </Grid>
           <Grid item xs={3} md={2}>
             <TextField
@@ -193,21 +207,10 @@ const BookingForm = () => {
             </FormControl>
           </Grid>
           <Grid item xs={3} md={2}>
-            <TextField
-              id="zip"
-              name="zip"
-              label="Zip"
-              fullWidth
-            />
+            <TextField id="zip" name="zip" label="Zip" fullWidth />
           </Grid>
           <Grid item xs={3} md={2}>
-            <TextField
-              id="date"
-              name="date"
-              type="date"
-             
-              fullWidth
-            />
+            <TextField id="date" name="date" type="date" fullWidth />
           </Grid>
           <Grid item xs={6}>
             <TextField
@@ -226,22 +229,41 @@ const BookingForm = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Button type="submit" variant="contained" fullWidth>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              style={{
+                backgroundColor: "#F0DD5D",
+                color: "#000",
+                borderRadius: "8px",
+              }}
+            >
               Find Installer
             </Button>
           </Grid>
         </Grid>
-
-
       </form>
-      {mappedInstaller.data && mappedInstaller.data.length > 0 && <InstallerDetails data={mappedInstaller.data[0]} />}
+      {mappedInstaller.data && mappedInstaller.data.length > 0 && (
+        <InstallerDetails data={mappedInstaller.data[0]} />
+      )}
       <CustomerDetails data={mappedInstaller} setOtherData={setOtherData} />
       <Grid item xs={4} sm={3} style={{ marginTop: "6vh" }}>
-        <Button variant="contained" onClick={createNewObject} style={{ padding: "20px" }}>
+        <Button
+          variant="contained"
+          onClick={createNewObject}
+          style={{
+            padding: "20px",
+            backgroundColor: "#96D232",
+            color: "#fff",
+            borderRadius: "8px",
+          }}
+        >
           Book Now
         </Button>
       </Grid>
-    </Box>
+    </Box></Box>
+
   );
 };
 export default BookingForm;

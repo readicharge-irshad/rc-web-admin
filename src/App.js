@@ -24,12 +24,13 @@ import AdminList from "./scenes/admin/AdminList";
 import NotAllowed from "./scenes/dashboard/NotAllowed";
 import UnderProgress from "./scenes/dashboard/Progress";
 
-const fixedUserName = "johndoe@example.com"
+const fixedUserName = "Brian@readicharge.com"
  function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
+  const [roles,setRoles] = useState([]);
    const handleLogin = (isValid) => {
     if (isValid) {
       setIsLoggedIn(true);
@@ -47,25 +48,25 @@ const fixedUserName = "johndoe@example.com"
         <div className="app">
           {isLoggedIn ? (
             <>
-              <Sidebar isSidebar={isSidebar} username={userName} isLoggedIn={isLoggedIn} />
+              <Sidebar isSidebar={isSidebar} username={userName} isLoggedIn={isLoggedIn} enabledSections={roles} />
               <main className="content">
                 <Topbar setIsSidebar={setIsSidebar} handleLogout={handleLogout} />
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" />} />
                   <Route path="/under-progress" element={<UnderProgress/>} />
                   <Route path="/dashboard" element={<DashboardComponent />} />
-                  <Route path="/installer" element={<InstallerList />} />
+                  <Route path="/installer" element={<InstallerList/>} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/jobs" element={<Invoices />} />
                   <Route path="/form" element={<Form />} />
-                  <Route path="/installerForm" element={<InstallerForm/>} />
+                  <Route path="/installerForm" element={<InstallerForm changedBy={userName}/>} />
                   <Route path="/labourRate" element={userName===fixedUserName ?<InstallerLabourRates />:<NotAllowed handleLogout={handleLogout}/>} />
                   <Route path="/materialTax" element={userName===fixedUserName ?<MaterialTaxForm />:<NotAllowed handleLogout={handleLogout}/>} />
                   <Route path="/material" element={userName===fixedUserName ?<Material />:<NotAllowed handleLogout={handleLogout}/>} />
                   <Route path="/service" element={userName===fixedUserName ?<Service />:<NotAllowed handleLogout={handleLogout}/>} />
                   <Route path="/serviceTime" element={userName===fixedUserName ?<ServiceTime />:<NotAllowed handleLogout={handleLogout}/>} />
                   <Route path="/servicePrice" element={userName===fixedUserName ?<ServicePrice />:<NotAllowed handleLogout={handleLogout}/>} />
-                  <Route path="/bookingForm" element={<CreateBookingForm />} />
+                  <Route path="/bookingForm" element={<CreateBookingForm  admin={userName}/>} />
                   <Route path="/customerForm" element={<CustomerForm />} />
                   <Route path="/admin" element={userName===fixedUserName ?<AdminForm />:<NotAllowed handleLogout={handleLogout}/>} />
                   <Route path="/admin-list" element={userName===fixedUserName ?<AdminList />:<NotAllowed handleLogout={handleLogout}/>} />
@@ -74,7 +75,7 @@ const fixedUserName = "johndoe@example.com"
               </main>
             </>
           ) : (
-            <LoginScreen onLogin={handleLogin} setUserName={setUserName} />
+            <LoginScreen onLogin={handleLogin} setUserName={setUserName}  setRoles={setRoles}/>
           )}
         </div>
       </ThemeProvider>

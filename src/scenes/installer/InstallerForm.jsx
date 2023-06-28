@@ -20,7 +20,7 @@ import { getserviceList, createInstaller } from "../../data/ApiController.js";
 
 
 
-const InstallerForm = () => {
+const InstallerForm = ({changedBy}) => {
   const [isDateActive, setIsDateActive] = useState(false);
   const [isFileActive, setIsFileActive] = useState(false);
   const [serviceList, setServiceList] = useState([]);
@@ -61,7 +61,10 @@ const InstallerForm = () => {
   };
 
   const handleMilesDistanceChange = (event) => {
-    setMilesDistance(event.target.value);
+    setFormData1((prevFormData) => ({
+      ...prevFormData,
+      miles_distance: event.target.value,
+    }));
   };
 
   const handleDateFocus = () => {
@@ -113,7 +116,7 @@ const InstallerForm = () => {
   const handleFormSubmit = (event) => {
     event.preventDefault();
     const selectedServiceIds = selectedServices.map((service) => service._id);
-    const newInstaller = { ...formData1, ...formData2, "services": selectedServiceIds };
+    const newInstaller = { ...formData1, ...formData2, "services": selectedServiceIds ,"changedBy":changedBy};
     console.log(newInstaller);
     createInstaller(newInstaller);
   };
@@ -127,15 +130,53 @@ const InstallerForm = () => {
   return (
     <Box m="20px">
       <Header title="Installer Details" subtitle="View and Update your Installer team details" />
-
       <Tabs value={tabIndex} onChange={handleTabChange}>
-        <Tab label="Personal Information" sx={{ '&.Mui-selected': { backgroundColor: '#96D232', borderRadius: '20px 20px 0px 0px', color: '#fff' } }}>
-        </Tab>
-        <Tab label="Licenses & Insurance" sx={{ '&.Mui-selected': { backgroundColor: '#96D232', borderRadius: '20px 20px 0px 0px' } }}>
-        </Tab>
-        <Tab label="Additional Information" sx={{ '&.Mui-selected': { backgroundColor: '#96D232', borderRadius: '20px 20px 0px 0px' } }}>
-        </Tab>
+        <Tab
+          label="Personal Information"
+          sx={{
+            "&.Mui-selected": {
+              backgroundColor: "#96D232 !important",
+              borderRadius: "20px 20px 0px 0px",
+              color: "#fff",
+            },
+            "&.MuiTab-root": {
+              backgroundColor: "#f0f0f0",
+              borderRadius: "20px 20px 0px 0px",
+            },
+          }}
+        />
+        <Tab
+          label="Licenses & Insurance"
+          sx={{
+            "&.Mui-selected": {
+              backgroundColor: "#96D232 !important",
+              borderRadius: "20px 20px 0px 0px",
+              color: "#fff",
+            },
+            "&.MuiTab-root": {
+              backgroundColor: "#f0f0f0",
+              borderRadius: "20px 20px 0px 0px",
+            },
+          }}
+        />
+        <Tab
+          label="Additional Information"
+          sx={{
+            "&.Mui-selected": {
+              backgroundColor: "#96D232 !important",
+              borderRadius: "20px 20px 0px 0px",
+              color: "#fff",
+            },
+            "&.MuiTab-root": {
+              backgroundColor: "#f0f0f0",
+              borderRadius: "20px 20px 0px 0px",
+            },
+          }}
+        />
       </Tabs>
+
+
+
 
       <form onSubmit={handleFormSubmit_01}>
         {tabIndex === 0 && (
@@ -151,6 +192,7 @@ const InstallerForm = () => {
               backgroundColor: "#f5f5f5",
               boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
               padding: "20px",
+              borderRadius: "10px",
             }}
           >
             {/* Add Personal Information fields here */}
@@ -280,8 +322,9 @@ const InstallerForm = () => {
               <InputLabel id="miles-distance-label">Miles Distance</InputLabel>
               <Select
                 labelId="miles-distance-label"
-                id="miles-distance"
-                value={milesDistance}
+                id="miles_distance"
+                name="miles_distance"
+                value={formData1.miles_distance || ''}
                 onChange={handleMilesDistanceChange}
               >
                 {[5, 10, 20, 30, 40, 50].map((distance) => (
@@ -291,6 +334,7 @@ const InstallerForm = () => {
                 ))}
               </Select>
             </FormControl>
+
             <Grid item xs={3} md={2}>
               <FormControl fullWidth>
                 <InputLabel id="state-select-label">State</InputLabel>
@@ -310,15 +354,24 @@ const InstallerForm = () => {
               </FormControl>
             </Grid>
 
-            <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" style={{ backgroundColor: "#96D232", padding: "8px" }} variant="contained">
+            <Box display="flex" mt="20px" gridColumn="span 4">
+              <Button
+                type="submit"
+                style={{
+                  backgroundColor: "#96D232",
+                  padding: "8px",
+                  color: "#fff",
+                  borderRadius: "8px",
+                }}
+                variant="contained"
+              >
                 Submit and Continue
               </Button>
             </Box>
           </Box>
-
         )}
       </form>
+
 
       <form onSubmit={handleFormSubmit_02}
       >
@@ -332,6 +385,9 @@ const InstallerForm = () => {
               "& > div": {
                 gridColumn: isNonMobile ? undefined : "span 4",
               },
+              backgroundColor: "#f5f5f5",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              padding: "20px"
             }}
           >
             {/* Add Company Information fields here */}
@@ -375,7 +431,7 @@ const InstallerForm = () => {
               variant="filled"
               type="file"
               label={isFileActive ? "" : "Image License"}
-              
+
               onBlur={handleFileBlur}
               onFocus={handleFileFocus}
               name="imageLicense"
@@ -698,7 +754,7 @@ const InstallerForm = () => {
                 }
               }}
             />
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="flex" mt="20px">
               <Button type="submit" style={{ backgroundColor: "#96D232", padding: "8px" }} variant="contained">
                 Submit and Continue
               </Button>
@@ -720,6 +776,9 @@ const InstallerForm = () => {
                 "& > div": {
                   gridColumn: isNonMobile ? undefined : "span 4",
                 },
+                backgroundColor: "#f5f5f5",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                padding: "20px"
               }}
             >
               {/* Add Service related fields here */}
@@ -745,8 +804,8 @@ const InstallerForm = () => {
               </List>
 
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+            <Box display="flex" mt="20px">
+              <Button type="submit" color="primary" variant="contained">
                 Submit
               </Button>
             </Box>
