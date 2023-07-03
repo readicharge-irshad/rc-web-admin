@@ -8,7 +8,7 @@ const Service = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = (values) => {
-    //  name, description, certification, yearsOfExperienceerience
+    //  name, description, certification, yearsOfExperienceerience,notes
     createService(values)
   };
 
@@ -60,6 +60,19 @@ const Service = () => {
                 onChange={handleChange}
                 value={values.description}
                 name="description"
+                error={!!touched.description && !!errors.description}
+                helperText={touched.description && errors.description}
+                sx={{ gridColumn: "span 2" }}
+              />
+                  <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Additional Notes"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.notes}
+                name="notes"
                 error={!!touched.description && !!errors.description}
                 helperText={touched.description && errors.description}
                 sx={{ gridColumn: "span 2" }}

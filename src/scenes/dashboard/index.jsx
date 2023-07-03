@@ -9,6 +9,7 @@ import Header from "../../components/Header";
 import { getCountInstaller ,getBookingCount} from "../../data/ApiController.js";
 import { useEffect } from "react";
 import { useState } from "react";
+import StripePayments from "./PaymentList";
 
 const Dashboard =  () => {
   const [totalInstaller,setTotalInstaller] = useState("");
@@ -180,9 +181,8 @@ const Dashboard =  () => {
             colors={colors.grey[100]}
             p="15px"
           >
-            <Typography color="#96D232" variant="h5" fontWeight="600">
-              Recent Transactions
-            </Typography>
+
+            <StripePayments/>
           </Box>
           {/* {mockTransactions.map((transaction, i) => (
             <Box

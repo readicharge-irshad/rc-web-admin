@@ -1,59 +1,78 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button } from "@mui/material";
-import Header from "../../components/Header";
+import { Box, Button ,Dialog, DialogTitle, DialogContent, Typography} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { useTheme } from "@mui/material";
-import { tokens } from "../../theme";
-import {
-  getBookingsList,
-  getServiceNameById,
-  deleteBooking,
-  updateBooking,
-} from "../../data/ApiController.js";
+import Header from "../../components/Header";
+import { getBookingsList, getServiceNameById,getInstallerNameById,getMaterialNameById, deleteBooking, updateBooking } from "../../data/ApiController.js";
+import BookingDetails from "./BookingDetails";
 
-const BookingTable = () => {
+const BookingTable = ({admin}) => {
   const [bookingList, setBookingList] = useState([]);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = (booking) => {
+    setSelectedBooking(booking);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   useEffect(() => {
     fetchData();
   }, []);
+  const getCountBasedPadStart = (count) => {
+  if (count < 10) {
+    return 5;
+  } else if (count < 100) {
+    return 4;
+  } else if (count < 1000) {
+    return 3;
+  } else if (count < 10000) {
+    return 2;
+  }
+  else {
+    // add more conditions as needed
+    return 1; // fallback value
+  }
+};
 
   const fetchData = async () => {
     try {
       const callDataObject = await getBookingsList();
       const tempData = [];
-      for (const index in callDataObject.data) {
-        const dataObject = callDataObject.data[index];
-        console.log(dataObject)
+      var i = 0 ;
+      for (const dataObject of callDataObject.data) {
         const serviceName = await getServiceNameById(dataObject.service);
-        const materials = [];
-        for (const i in dataObject.material_details) {
-          materials.push(dataObject.material_details[i]);
-          console.log(dataObject.material_details[i]);
-        }
+        const installerName = await getInstallerNameById(dataObject.installer)
+        const materials = dataObject.material_details.map(async (material) => await getMaterialNameById(material.material_id));
+        
+         const count = i + 1;
+         const padStartCount = getCountBasedPadStart(count);
+         i++;
 
+        
         const dataToBePushed = {
-          id: `${dataObject._id}`,
-          shown_id: `RC-TOK-${dataObject._id}`,
+          id: dataObject._id,
+          shown_id: `RC-TOK-${count.toString().padStart(padStartCount, "0")}`,
           date: dataObject.date,
           time_start: dataObject.time_start,
           time_end: dataObject.time_end,
           number_of_installs: dataObject.number_of_installs,
           materialCost: dataObject.materialCost,
-          materialTax: dataObject.materialTax,
           material_details: materials,
+          charger_details:dataObject.charger_details,
           customerShowingCost: dataObject.customerShowingCost,
           paymentStatus: dataObject.paymentStatus,
           completionStatus: dataObject.completionStatus,
-          installer: `${dataObject.installer}`,
-          shown_installer: `RC-I-${dataObject.installer}`,
+          installer: dataObject.installer,
+          shown_installer:installerName,
           service: serviceName,
           service_id: dataObject.service,
           machinePurchasedByUser: dataObject.machinePurchasedByUser,
           labourRates: dataObject.labourRates,
-          changedBy:dataObject.changedBy
+          changedBy: dataObject.changedBy
         };
         tempData.push(dataToBePushed);
       }
@@ -73,24 +92,29 @@ const BookingTable = () => {
     }
   };
 
-  const handleRowUpdate = async (params) => {
-    const { id, field, value } = params;
+const handleRowUpdate = async (params) => {
+  const { id, field, value } = params;
+  
+  try {
     const updatedRow = {
       ...params.row,
       [field]: value,
+      changedBy:admin
     };
-  
-    try {
-      await updateBooking(id, updatedRow);
-      const updatedBookingList = bookingList.map((booking) =>
+    
+    await updateBooking(id, updatedRow);
+    
+    setBookingList((prevBookingList) => {
+      const updatedBookingList = prevBookingList.map((booking) =>
         booking.id === id ? updatedRow : booking
       );
-      setBookingList([...updatedBookingList]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  
+      return updatedBookingList;
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
   const columns = [
     { field: "shown_id", headerName: "ID", width: 100 },
@@ -99,7 +123,6 @@ const BookingTable = () => {
     { field: "time_end", headerName: "End Time", width: 150, editable: true },
     { field: "number_of_installs", headerName: "Number of Installs", width: 200 },
     { field: "materialCost", headerName: "Material Cost", width: 200 },
-    { field: "material_details", headerName: "Material Details", width: 400 },
     { field: "customerShowingCost", headerName: "Customer Showing Cost", width: 250 },
     { field: "paymentStatus", headerName: "Payment Status", width: 200 },
     { field: "completionStatus", headerName: "Completion Status", width: 200 },
@@ -107,10 +130,11 @@ const BookingTable = () => {
     { field: "service", headerName: "Service", width: 200 },
     { field: "machinePurchasedByUser", headerName: "Machine Purchased By User", width: 250 },
     { field: "labourRates", headerName: "Labour Rates", width: 200 },
+    
     {
       field: "actions",
       headerName: "Actions",
-      width: 200,
+      width: 300,
       renderCell: (params) => (
         <Box>
           <Button
@@ -128,12 +152,17 @@ const BookingTable = () => {
           >
             Update
           </Button>
+          <Button
+        variant="contained"
+        style={{ marginLeft: "16px" }}
+        color="primary"
+        onClick={() => handleOpenModal(params.row)}
+      >
+        View Details
+      </Button>
         </Box>
       ),
     },
-    { field: "changedBy",headerName: "Changed By",width:400},
-    
-    
   ];
 
   return (
@@ -149,9 +178,6 @@ const BookingTable = () => {
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
           },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "#94d034",
             borderBottom: "none",
@@ -163,23 +189,29 @@ const BookingTable = () => {
             borderTop: "none",
             backgroundColor: "#94d034",
           },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[700]} !important`,
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[400]} !important`,
-          },
         }}
       >
         <DataGrid
           rows={bookingList}
           columns={columns}
-          components={{ Toolbar: GridToolbar }}
+          components={{
+            Toolbar: GridToolbar,
+          }}
           editMode="row"
-          onEditCellChange={handleRowUpdate}
-          // Add other DataGrid props as needed
+          
         />
       </Box>
+      <Dialog open={openModal} onClose={handleCloseModal}>
+        <DialogTitle>Booking Details</DialogTitle>
+        <DialogContent>
+          {selectedBooking && (
+            <Box>
+              <BookingDetails booking={selectedBooking} />
+              {/* Add other booking details here */}
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

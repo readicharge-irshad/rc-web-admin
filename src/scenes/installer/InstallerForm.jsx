@@ -104,6 +104,7 @@ const InstallerForm = ({changedBy}) => {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData.entries());
     setFormData1(data);
+    alert("Data is saved !! Go to next Tab to continue filling other Details ");
   };
 
   const handleFormSubmit_02 = (event) => {
@@ -111,14 +112,16 @@ const InstallerForm = ({changedBy}) => {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData.entries());
     setFormData2(data);
+    alert("Data is Saved !! Go to the last section for filling some additional details and then submit");
   };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
     const selectedServiceIds = selectedServices.map((service) => service._id);
-    const newInstaller = { ...formData1, ...formData2, "services": selectedServiceIds ,"changedBy":changedBy};
+    const newInstaller = { ...formData1, ...formData2,"services": selectedServiceIds ,"changedBy":changedBy};
     console.log(newInstaller);
     createInstaller(newInstaller);
+    alert("New Installer Created !! ");
   };
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabChange = (event, newValue) => {

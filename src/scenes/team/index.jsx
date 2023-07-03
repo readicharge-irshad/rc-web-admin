@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
-import { Box, TextField, useTheme, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import { getInstallerList, deleteInstaller, updateInstaller, getServiceNameById, createInstaller } from "../../data/ApiController.js";
+import { FormControl,FormLabel,FormGroup,FormControlLabel,Checkbox,Box, TextField, useTheme, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { getInstallerList, deleteInstaller, updateInstaller, getServiceNameById, createInstaller, getserviceList } from "../../data/ApiController.js";
 import InstallerServicesPieChart from "../../components/PieChart";
 import GeographyChart_02 from "../../components/Geographychart_02";
 
@@ -26,7 +26,21 @@ const handleUpdate = async (id, row) => {
   if(response.status===200) alert("done")
   getInstallerList(); // Refresh the installer list after update
 };
-
+const getCountBasedPadStart = (count) => {
+  if (count < 10) {
+    return 5;
+  } else if (count < 100) {
+    return 4;
+  } else if (count < 1000) {
+    return 3;
+  } else if (count < 10000) {
+    return 2;
+  }
+  else {
+    // add more conditions as needed
+    return 1; // fallback value
+  }
+};
 
 
 const createInstallersFromCSV = async (installerData) => {
@@ -84,7 +98,7 @@ const InstallerList = () => {
 
   const fetchInstallerList = async () => {
     const installerData = await getInstallerList();
-    console.log(installerData.data);
+    console.log(installerData.data.length);
 
     // for the Geo map this section of code is being used 
     if (installerData.data.length > 0) {
@@ -103,9 +117,13 @@ const InstallerList = () => {
     for (let i = 0; i < installerData.data.length; i++) {
       const dataObject = installerData.data[i];
 
+      // For the installer Id Count  ** These ID is use for no technical functionalities , just for the client demand for the better reference 
+    const count = i + 1;
+     const padStartCount = getCountBasedPadStart(count);
+
       let data_to_be_pushed = {
         id: dataObject._id,
-        shown_id: `RC-I-${dataObject._id}`,
+        shown_id:`RC-IN-${count.toString().padStart(padStartCount, "0")}`,
         firstName: dataObject.firstName,
         lastName: dataObject.lastName,
         companyName: dataObject.companyName,
@@ -250,14 +268,14 @@ const InstallerList = () => {
           >
             Delete
           </Button>
-          <Button
+{/*           <Button
             variant="contained"
             style={{ marginLeft: "16px" }}
             color="primary"
             onClick={() => handleUpdate(params.row.id, params.row)}
           >
             Update
-          </Button>
+          </Button> */}
           <Button
             variant="contained"
             style={{ marginLeft: "16px" }}
@@ -417,12 +435,25 @@ const InstallerDetailsModal = ({
   handleUpdate,
 }) => {
   const [formData, setFormData] = useState(null);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     if (selectedInstaller) {
       setFormData(selectedInstaller);
     }
   }, [selectedInstaller]);
+
+  useEffect(() => {
+    // Fetch the list of services from an API or any data source
+    // For simplicity, we'll use a static array of services here
+    const fetchServices = async () => {
+      const response = await getserviceList();
+      const data = await response.data
+      setServices(data);
+    };
+
+    fetchServices();
+  }, []);
 
   const handleFieldChange = (event) => {
     const { name, value } = event.target;
@@ -432,9 +463,25 @@ const InstallerDetailsModal = ({
     }));
   };
 
+  const handleServiceChange = (event) => {
+    const { value, checked } = event.target;
+    const serviceId = value;
+    setFormData((prevFormData) => {
+      const updatedServices = checked
+        ? [...prevFormData.services, serviceId]
+        : prevFormData.services.filter((id) => id !== serviceId);
+  
+      return {
+        ...prevFormData,
+        services: updatedServices,
+      };
+    });
+  };
+  
   if (!formData) {
     return null; // You can render a loading spinner or placeholder while waiting for selectedInstaller data
   }
+
 
   return (
 
@@ -681,7 +728,7 @@ const InstallerDetailsModal = ({
         name="bondingEffectiveStartDate"
         label="Bonding Effective Start Date"
         type="date"
-        value={formData.bondingEffectiveStartDate || ""}
+        value={formatDate(formData.bondingEffectiveStartDate) || ""}
         onChange={handleFieldChange}
         fullWidth
         margin="normal"
@@ -693,7 +740,7 @@ const InstallerDetailsModal = ({
         name="bondingEffectiveEndDate"
         label="Bonding Effective End Date"
         type="date"
-        value={formData.bondingEffectiveEndDate || ""}
+        value={formatDate(formData.bondingEffectiveEndDate) || ""}
         onChange={handleFieldChange}
         fullWidth
         margin="normal"
@@ -701,6 +748,24 @@ const InstallerDetailsModal = ({
           shrink: true,
         }}
       />
+       <FormControl component="fieldset">
+            <FormLabel component="legend">Services</FormLabel>
+            <FormGroup>
+              {services.map((service) => (
+                <FormControlLabel
+                  key={service._id}
+                  control={
+                    <Checkbox
+                      checked={formData.services.includes(service._id)}
+                      onChange={handleServiceChange}
+                      value={service._id.toString()}
+                    />
+                  }
+                  label={service.name}
+                />
+              ))}
+            </FormGroup>
+          </FormControl>
     </Box>
   </DialogContent>
   <DialogActions>

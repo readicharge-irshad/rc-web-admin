@@ -15,6 +15,7 @@ import {
 import Header from '../../components/Header.jsx';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { getLabourRate, createLabourRate, getserviceList } from '../../data/ApiController.js';
+import GeographyChart from '../../components/Geographychart_02';; // Import the GeographyChart component
 
 const states = [
   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
@@ -34,6 +35,10 @@ const LabourRateForm = () => {
   const [selectedService, setSelectedService] = useState('');
   const [labourRatesList, setLabourRatesList] = useState([]);
   const [formState, setFormState] = useState([]);
+  const [chartData1, setChartData1] = useState([]);
+const [chartData2, setChartData2] = useState([]);
+const [chartData3, setChartData3] = useState([]);
+
 
   useEffect(() => {
     fetchData();
@@ -66,6 +71,7 @@ const LabourRateForm = () => {
     if (data.data) {
       console.log(data.data);
       setLabourRatesList(data.data);
+      
     }
   }
 
@@ -89,6 +95,9 @@ const LabourRateForm = () => {
         number_of_installs: i + 1,
         service_id: selectedService,
       };
+      if (i === 0) setChartData1(data.price_statewise); // Set chartData1
+      else if (i === 1) setChartData2(data.price_statewise); // Set chartData2
+      else if (i === 2) setChartData3(data.price_statewise); // Set chartData3
       await createLabourRate(data);
     }
 
@@ -104,6 +113,14 @@ const LabourRateForm = () => {
 
     setSelectedService(labourRate.service_id);
     setFormState(updatedFormState);
+  };
+
+  const getCountBasedPadStart = (count) => {
+    if (count <= 3) {
+      return 1;
+    } else {
+      return 2;
+    }
   };
 
   const handleServiceSelect = (event) => {
@@ -132,102 +149,135 @@ const LabourRateForm = () => {
 
 
   return (
-<>
-<Header title="Labour Rates" subtitle="Manage your labour rate" />
-    <div style={{ display: 'flex' }}>
-       
+    <>
+      <Header title="Labor Rates" subtitle="Manage your labor rate" />
+      <div style={{ display: 'flex' }}>
 
-      <FormControl sx={{ minWidth: 120, marginLeft: '20px' }}>
-        <InputLabel id="service-select-label">Service</InputLabel>
-        <Select
-          labelId="service-select-label"
-          id="service-select"
-          value={selectedService}
-          onChange={handleServiceSelect}
-        >
-          {serviceList.map((service) => (
-            <MenuItem key={service._id} value={service._id}>
-              {service.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        <FormControl sx={{ minWidth: 120, marginLeft: '20px' }}>
+          <InputLabel id="service-select-label">Service</InputLabel>
+          <Select
+            labelId="service-select-label"
+            id="service-select"
+            value={selectedService}
+            onChange={handleServiceSelect}
+          >
+            {serviceList.map((service) => (
+              <MenuItem key={service._id} value={service._id}>
+                {service.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-      <form onSubmit={handleSubmit}>
-        <Grid spacing={2}>
-          <Grid container item>
-            <div style={{ height: '84vh', overflow: 'auto' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>State</TableCell>
-                    <TableCell>Price 1</TableCell>
-                    <TableCell>Price 2</TableCell>
-                    <TableCell>Price 3</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {formState.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <TextField
-                          name={`price_statewise[${index}][state]`}
-                          value={item.state}
-                          disabled
-                          fullWidth
-                        />
-                      </TableCell>
-                      {item.prices.map((price, priceIndex) => (
-                        <TableCell key={priceIndex}>
+        <form onSubmit={handleSubmit}>
+          <Grid spacing={2}>
+            <Grid container item>
+              <div style={{ height: '84vh', overflow: 'auto' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>State</TableCell>
+                      <TableCell>Price 1</TableCell>
+                      <TableCell>Price 2</TableCell>
+                      <TableCell>Price 3</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {formState.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
                           <TextField
-                            name={`price_statewise[${index}][prices][${priceIndex}]`}
-                            value={price}
-                            onChange={(event) =>
-                              handleInputChange(event, index, priceIndex)
-                            }
+                            name={`price_statewise[${index}][state]`}
+                            value={item.state}
+                            disabled
                             fullWidth
                           />
                         </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                        {item.prices.map((price, priceIndex) => (
+                          <TableCell key={priceIndex}>
+                            <TextField
+                              name={`price_statewise[${index}][prices][${priceIndex}]`}
+                              value={price}
+                              onChange={(event) =>
+                                handleInputChange(event, index, priceIndex)
+                              }
+                              fullWidth
+                            />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </Grid>
+            <Grid item>
+              <Button variant="contained" type="submit" fullWidth style={{ padding: "20px" }}>
+                Submit
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Button variant="contained" type="submit" fullWidth style={{ padding: "20px" }}>
-              Submit
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
+        </form>
 
-      <Paper sx={{ backgroundColor: "#f5f5f5", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)" }}>
-        <Table sx={{ minWidth: 400 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#96D232" }}>Service ID</TableCell>
-              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#96D232" }}>Number of Installs</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {labourRatesList.map((labourRate) => (
-              <TableRow
-                key={labourRate._id}
-                onClick={() => handleRowClick(labourRate)}
-                style={{ cursor: "pointer", backgroundColor: "#ffffff" }}
-              >
-                <TableCell>RC-SERV-{labourRate.service_id}</TableCell>
-                <TableCell>{labourRate.number_of_installs}</TableCell>
+        <Paper sx={{ backgroundColor: "#f5f5f5", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)" }}>
+          <Table sx={{ minWidth: 400 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold", backgroundColor: "#96D232" }}>Service ID</TableCell>
+                <TableCell sx={{ fontWeight: "bold", backgroundColor: "#96D232" }}>Number of Installs</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+            </TableHead>
+            <TableBody>
+              {labourRatesList.map((labourRate, index) => {
+                const count = Math.floor(index / 3) + 1;
+                const padStartCount = getCountBasedPadStart(count);
+                const serviceId = `RC-SERV-${count.toString().padStart(padStartCount, "0")}`;
 
-    </div>
-</>
+                return (
+                  <TableRow
+                    key={labourRate._id}
+                    onClick={() => handleRowClick(labourRate)}
+                    style={{ cursor: "pointer", backgroundColor: "#ffffff" }}
+                  >
+                    <TableCell>{serviceId}</TableCell>
+                    <TableCell>{labourRate.number_of_installs}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Paper>
+      </div>
+      
+      {/* Add geographyChart three times */}
+{/*       <Box mt={4} display="flex" justifyContent="space-between">
+      <Box width="30%">
+  <Typography variant="h6" mb={2}>
+    Geography Chart 1
+  </Typography>
+  <Paper sx={{ height: 400 }}>
+    <GeographyChart data={chartData1} />
+  </Paper>
+</Box>
+<Box width="30%">
+  <Typography variant="h6" mb={2}>
+    Geography Chart 2
+  </Typography>
+  <Paper sx={{ height: 400 }}>
+    <GeographyChart data={chartData2} />
+  </Paper>
+</Box>
+<Box width="30%">
+  <Typography variant="h6" mb={2}>
+    Geography Chart 3
+  </Typography>
+  <Paper sx={{ height: 400 }}>
+    <GeographyChart data={chartData3} />
+  </Paper>
+</Box>
+
+      </Box> */}
+    </>
   );
 };
 

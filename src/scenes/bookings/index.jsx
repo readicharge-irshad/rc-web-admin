@@ -16,6 +16,7 @@ import { createBooking, getMaterialTax, getMostSuitableInstaller, getserviceList
 import InstallerDetails from "./mappedInstaller.jsx";
 import CustomerDetails from "./otherDetails.jsx";
 import Header from "../../components/Header.jsx";
+import CostDetails from "./payment.jsx";
 
 
 const BookingForm = ({admin}) => {
@@ -27,6 +28,11 @@ const BookingForm = ({admin}) => {
   const [customerData, setCustomerData] = useState([]);
   const [materialTaxId, setMaterialTaxId] = useState('');
   const [selectedState, setSelectedState] = useState('');
+  const [materialCost, setMaterialCost] = useState('');
+  const [laborCost, setLaborCost] = useState('');
+  const [customerCost, setCustomerCost] = useState('');
+  const [bookingStatus,setBookingStatus] = useState(false);
+  const [bookingId,setBookingId] = useState("");
 
   useEffect(() => {
     const fetchServiceList = async () => {
@@ -58,11 +64,11 @@ const BookingForm = ({admin}) => {
     const zip = event.target.zip.value;
     const date = event.target.date.value;
     const addressLine1 = event.target.addressLine1.value;
-    const addressLine2 = event.target.addressLine2.value;
+    const city = event.target.city.value;
 
     const newInstallerFindingDetailsToken = {
       addressLine1: addressLine1,
-      addressLine2: addressLine2,
+      city: city,
       zip: zip,
       state: state,
       date: date,
@@ -87,14 +93,15 @@ const BookingForm = ({admin}) => {
 
 
 
-  const createNewObject = () => {
+  const createNewObject =  async () => {
     const {
-      materialDetails
+      materialDetails,
+      chargerDetailsForMaterial
     } = otherData;
 
     const {
       addressLine1,
-      addressLine2,
+      city,
       zip,
       state,
       date,
@@ -114,7 +121,7 @@ const BookingForm = ({admin}) => {
     const newObject = {
       installer_id: installer,
       addressLine1: addressLine1,
-      addressLine2: addressLine2,
+      city: city,
       zip: zip,
       state: state,
       service: serviceId,
@@ -124,12 +131,25 @@ const BookingForm = ({admin}) => {
       paymentStatus: "Pending",
       completionStatus: false,
       number_of_installs: parseInt(numberOfInstall),
+      charger_details:chargerDetailsForMaterial,
       material_details: material_details,
       material_tax_id: materialTaxId,
       changedBy:admin
     };
 
-    createBooking(newObject);
+   const response= await createBooking(newObject);
+   console.log(response)
+    if(response.status===201)
+    {
+      setBookingStatus(true);
+      setBookingId(response.data.booking._id)
+      setMaterialCost(response.data.booking.materialCost);
+      setLaborCost(response.data.booking.labourRates);
+      setCustomerCost(response.data.booking.customerShowingCost);
+    }
+    else{
+      alert("Booking not Created !!!")
+    }
   }
 
   return (
@@ -222,9 +242,9 @@ const BookingForm = ({admin}) => {
           </Grid>
           <Grid item xs={4}>
             <TextField
-              id="addressLine2"
-              name="addressLine2"
-              label="Address Line 2"
+              id="city"
+              name="city"
+              label="City"
               fullWidth
             />
           </Grid>
@@ -262,6 +282,9 @@ const BookingForm = ({admin}) => {
           Book Now
         </Button>
       </Grid>
+      { bookingStatus && (
+        <CostDetails laborCost={laborCost} materialCost={materialCost} customerCost={customerCost} bookingId={bookingId}/>
+      )}
     </Box></Box>
 
   );

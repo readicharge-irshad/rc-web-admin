@@ -57,7 +57,7 @@ const fixedUserName = "Brian@readicharge.com"
                   <Route path="/dashboard" element={<DashboardComponent />} />
                   <Route path="/installer" element={<InstallerList/>} />
                   <Route path="/contacts" element={<Contacts />} />
-                  <Route path="/jobs" element={<Invoices />} />
+                  <Route path="/jobs" element={<Invoices admin={userName} />} />
                   <Route path="/form" element={<Form />} />
                   <Route path="/installerForm" element={<InstallerForm changedBy={userName}/>} />
                   <Route path="/labourRate" element={userName===fixedUserName ?<InstallerLabourRates />:<NotAllowed handleLogout={handleLogout}/>} />

@@ -51,8 +51,31 @@ const CustomerDetails = ({ setOtherData, data }) => {
 
   const handleAddCharger = () => {
     setShowChargerDetails(true);
+    const newChargerDetails = {
+      model: '',
+      type: '',
+      Charger_received_by: '',
+      exsisting_outlet: '',
+      upgraded_to_nema: '',
+      charger_location: '',
+      attached_home: '',
+      electrical_panel_location: '',
+      floor: '',
+      interior_wall_finish: '',
+      exterior_wall_finish: '',
+      wall_construction: '',
+      electrical_panel_type: '',
+      panel_brand: '',
+      main_breaker_size: '',
+      greater_equal: '',
+      open_breakers: '',
+      recessed_panel: '',
+      distance_panel: '',
+      // Add other charger details fields here
+    };
+    setChargerDetails([...chargerDetails, newChargerDetails]);
   };
-
+  
   const handleMaterialChange = (event) => {
     setSelectedMaterial(event.target.value);
   };
@@ -84,16 +107,23 @@ const CustomerDetails = ({ setOtherData, data }) => {
     setNumOfInstalls(event.target.value);
   };
 
-  const handleChargerDetailsChange = (event, chargerIndex) => {
-    const { name, value } = event.target;
+  const handleChargerDetailsChange = (event, chargerIndex, fieldName) => {
+    const { value } = event.target;
     const updatedChargerDetails = [...chargerDetails];
-    const chargerDetailsObj = updatedChargerDetails[chargerIndex] || {};
-
-    chargerDetailsObj[name] = value;
-    updatedChargerDetails[chargerIndex] = chargerDetailsObj;
-
+  
+    if (chargerIndex >= updatedChargerDetails.length) {
+      const newChargerDetails = { [fieldName]: value };
+      updatedChargerDetails.push(newChargerDetails);
+    } else {
+      updatedChargerDetails[chargerIndex] = {
+        ...updatedChargerDetails[chargerIndex],
+        [fieldName]: value,
+      };
+    }
+  
     setChargerDetails(updatedChargerDetails);
   };
+  
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -106,9 +136,34 @@ const CustomerDetails = ({ setOtherData, data }) => {
       };
     });
 
+    const chargerDetailsForMaterial = chargerDetails.map((charger) => {
+      return {
+        model: charger.model,
+        type: charger.type,
+        charger_received_by: charger.Charger_received_by,
+        exsisting_outlet: charger.exsisting_outlet,
+        upgraded_to_nema: charger.upgraded_to_nema,
+        charger_location: charger.charger_location,
+        attached_home: charger.attached_home,
+        electrical_panel_location: charger.electrical_panel_location,
+        floor: charger.floor,
+        interior_wall_finish: charger.interior_wall_finish,
+        exterior_wall_finish: charger.exterior_wall_finish,
+        wall_construction: charger.wall_construction,
+        electrical_panel_type: charger.electrical_panel_type,
+        panel_brand: charger.panel_brand,
+        main_breaker_size: charger.main_breaker_size,
+        greater_equal: charger.greater_equal,
+        open_breakers: charger.open_breakers,
+        recessed_panel: charger.recessed_panel,
+        distance_panel: charger.distance_panel,
+        // Include other charger details fields here
+      };
+    });
+
     const formDetails = {
       materialDetails,
-      chargerDetails,
+      chargerDetailsForMaterial,
       ...formData,
     };
 
@@ -167,7 +222,7 @@ const CustomerDetails = ({ setOtherData, data }) => {
               }
             />
           </Grid>
-          <Grid item xs={12} style={{display:"flex"}}>
+          <Grid item xs={12} style={{ display: "flex" }}>
             <Button
               variant="contained"
               onClick={handleAddMaterial}
@@ -181,8 +236,8 @@ const CustomerDetails = ({ setOtherData, data }) => {
               label="Select Material"
               value={selectedMaterial}
               onChange={handleMaterialChange}
-              sx={{minWidth:"120px"}}
-             
+              sx={{ minWidth: "120px" }}
+
             >
               {materialList.map((material) => (
                 <MenuItem key={material.id} value={material.id} >
@@ -190,39 +245,39 @@ const CustomerDetails = ({ setOtherData, data }) => {
                 </MenuItem>
               ))}
             </TextField>
-            </Grid>
-            {addedMaterials.map((addedMaterial, index) => (
-              <Box key={index} style={{ display: 'flex' ,margin: '10px', padding: '10px' }}>
-                <TextField
-                  label="Material"
-                  value={materialList.find((material) => material.id === addedMaterial.materialId)?.material_name}
-                  fullWidth
-                  disabled
-                />
-                <TextField
-                  label="Number of Installs"
-                  value={addedMaterial.numInstalls}
-                  onChange={(event) =>
-                    handleNumInstallsChange(event, addedMaterial.materialId)
-                  }
-                  fullWidth
-                  sx={{ marginLeft: '10px' }}
-                />
-              </Box>
-            ))}
-        
-  
-          <Grid item xs={12} style={{display:"flex"}} >
+          </Grid>
+          {addedMaterials.map((addedMaterial, index) => (
+            <Box key={index} style={{ display: 'flex', margin: '10px', padding: '10px' }}>
+              <TextField
+                label="Material"
+                value={materialList.find((material) => material.id === addedMaterial.materialId)?.material_name}
+                fullWidth
+                disabled
+              />
+              <TextField
+                label="Number of Installs"
+                value={addedMaterial.numInstalls}
+                onChange={(event) =>
+                  handleNumInstallsChange(event, addedMaterial.materialId)
+                }
+                fullWidth
+                sx={{ marginLeft: '10px' }}
+              />
+            </Box>
+          ))}
+
+
+          <Grid item xs={12} style={{ display: "flex" }} >
             <Button variant="contained" onClick={handleAddCharger}>
               Add Charger
             </Button>
-  
+
             <TextField
               label="Number of Chargers"
               select
               value={numOfInstalls}
               onChange={handleNumOfInstallsChange}
-              sx={{ marginLeft: '10px' , minWidth:"120px"}}
+              sx={{ marginLeft: '10px', minWidth: "120px" }}
             >
               <MenuItem value={1}>1</MenuItem>
               <MenuItem value={2}>2</MenuItem>
@@ -238,73 +293,163 @@ const CustomerDetails = ({ setOtherData, data }) => {
                 <Box>
                   <TextField
                     label="Model of Charger"
-                    style={{margin:"4px"}}
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
-                      handleChargerDetailsChange(event, index, "modelOfCharger")
+                      handleChargerDetailsChange(event, index, "model")
                     }
                   />
                   <TextField
                     label="Type"
-                    style={{margin:"4px"}}
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
                       handleChargerDetailsChange(event, index, "type")
                     }
                   />
                   <TextField
-                    label="Date when purchased"
-                    style={{margin:"4px"}}
+                    label="Charger received by"
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
-                      handleChargerDetailsChange(event, index, "datePurchased")
+                      handleChargerDetailsChange(event, index, "Charger_received_by")
                     }
                   />
                   <TextField
                     label="Existing Outlet"
-                    style={{margin:"4px"}}
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
-                      handleChargerDetailsChange(event, index, "existingOutlet")
+                      handleChargerDetailsChange(event, index, "exsisting_outlet")
                     }
                   />
                   <TextField
-                    label="Breaker Size"
-                    style={{margin:"4px"}}
+                    label="Upgraded to NEMA"
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
-                      handleChargerDetailsChange(event, index, "breakerSize")
+                      handleChargerDetailsChange(event, index, "upgraded_to_nema")
                     }
                   />
                   <TextField
-                    label="Is GFCI required"
-                    style={{margin:"4px"}}
+                    label="Charger Location"
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
-                      handleChargerDetailsChange(event, index, "isGFCIRequired")
+                      handleChargerDetailsChange(event, index, "charger_location")
                     }
                   />
                   <TextField
-                    label="Existing Charger"
-                    style={{margin:"4px"}}
+                    label="Attached to Home"
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
-                      handleChargerDetailsChange(event, index, "existingCharger")
+                      handleChargerDetailsChange(event, index, "attached_home")
                     }
                   />
                   <TextField
-                    label="Electricity Meter"
-                    style={{margin:"4px"}}
+                    label="Electrical Panel Location"
+                    style={{ margin: "4px" }}
                     xs={3}
                     onChange={(event) =>
-                      handleChargerDetailsChange(event, index, "electricityMeter")
+                      handleChargerDetailsChange(event, index, "electrical_panel_location")
+                    }
+                  />
+                  <TextField
+                    label="Floor"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "floor")
+                    }
+                  />
+                  <TextField
+                    label="Interior Wall Finish"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "interior_wall_finish")
+                    }
+                  />
+                  <TextField
+                    label="Exterior Wall Finish"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "exterior_wall_finish")
+                    }
+                  />
+                  <TextField
+                    label="Wall Construction"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "wall_construction")
+                    }
+                  />
+                  <TextField
+                    label="Electrical Panel Type"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "electrical_panel_type")
+                    }
+                  />
+                  <TextField
+                    label="Panel Brand"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "panel_brand")
+                    }
+                  />
+                  <TextField
+                    label="Main Breaker Size"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "main_breaker_size")
+                    }
+                  />
+                  <TextField
+                    label="Greater/Equal"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "greater_equal")
+                    }
+                  />
+                  <TextField
+                    label="Open Breakers"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "open_breakers")
+                    }
+                  />
+                  <TextField
+                    label="Recessed Panel"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "recessed_panel")
+                    }
+                  />
+                  <TextField
+                    label="Distance Panel"
+                    style={{ margin: "4px" }}
+                    xs={3}
+                    onChange={(event) =>
+                      handleChargerDetailsChange(event, index, "distance_panel")
                     }
                   />
                 </Box>
               )}
             </Grid>
           ))}
-          <Grid item xs={4} style={{marginTop:"20px"}}>
+
+
+          <Grid item xs={4} style={{ marginTop: "20px" }}>
             <Button type="submit" variant="contained" color="primary" fullWidth>
               Submit  Customer  Details
             </Button>

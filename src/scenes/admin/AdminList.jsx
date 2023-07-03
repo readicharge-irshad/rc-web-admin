@@ -22,7 +22,7 @@ const AdminList = () => {
       let roles = dataObject.roles || [];
 
       let data_to_be_pushed = {
-        shown_id: `RC-ADM-${dataObject._id}`,
+        shown_id: `RC-AD-${(i + 1).toString().padStart(5, "0")}`,
         id: dataObject._id,
         name: dataObject.name,
         email: dataObject.email,
@@ -64,7 +64,7 @@ const AdminList = () => {
       const adminEmail = getAdmin[adminIndex].email;
       const updatedRolesCopy = [...getAdmin];
       const adminRoles = updatedRolesCopy[adminIndex].roles || [];
-  
+
       if (adminRoles.includes(role)) {
         // Remove the role if already present
         const updatedRoles = adminRoles.filter((r) => r !== role);
@@ -73,18 +73,17 @@ const AdminList = () => {
         // Add the role if not present
         updatedRolesCopy[adminIndex].roles = [...adminRoles, role];
       }
-  
+
       setGetAdmin(updatedRolesCopy);
     }
   };
-  
+
   const handleCellEditCommit = async ({ id, field, value }) => {
     const updatedAdmin = { ...getAdmin[id], [field]: value };
     await updateAdmin(id, updatedAdmin);
-    
+
     fetchAdminList(); // Refresh the admin list after update
   };
-  
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -93,9 +92,15 @@ const AdminList = () => {
   const roles = ['Installer', 'Customer', 'Service', 'Material', 'Payments'];
 
   const columns = [
+        {
+      field: "shown_id",
+      headerName: "ID",
+      cellClassName: (params) =>
+        params.row.email === "Brian@readicharge.com" ? "highlighted-row" : "",
+    },
     {
       field: "id",
-      headerName: "ID",
+      headerName: "Reference ID",
       cellClassName: (params) =>
         params.row.email === "Brian@readicharge.com" ? "highlighted-row" : "",
     },
@@ -211,7 +216,7 @@ const AdminList = () => {
               color: colors.white,
             },
             "& .highlighted-row": {
-              backgroundColor: "#94d034",
+              backgroundColor: "#F0DD5D",
               fontWeight: "bold",
             },
           }}
