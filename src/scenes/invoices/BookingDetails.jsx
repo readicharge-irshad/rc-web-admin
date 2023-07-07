@@ -10,7 +10,7 @@ const BookingDetails = ({ booking }) => {
       <Grid container spacing={2} sx={{ mt: 2 }}>
         <Grid item xs={12} sm={6}>
           <TextField label="Machine Purchased By User" value={booking.machinePurchasedByUser.toString()} fullWidth disabled sx={{ mb: 1 }} />
-          <TextField label="Installer" value={booking.installer} fullWidth disabled sx={{ mb: 1 }} />
+          <TextField label="Installer" value={booking.shown_installer} fullWidth disabled sx={{ mb: 1 }} />
           <TextField label="Service" value={booking.service} fullWidth disabled sx={{ mb: 1 }} />
           <TextField label="Start Time" value={booking.time_start} fullWidth disabled sx={{ mb: 1 }} />
           <TextField label="End Time" value={booking.time_end} fullWidth disabled sx={{ mb: 1 }} />
