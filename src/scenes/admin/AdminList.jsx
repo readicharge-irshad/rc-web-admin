@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Box, Typography, useTheme, Button, Checkbox } from "@mui/material";
+import { Box, Typography, useTheme, Button, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
 import { getAdminData, deleteAdmin, updateAdmin } from "../../data/ApiController.js";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
@@ -10,6 +10,9 @@ const AdminList = () => {
   const [getAdmin, setGetAdmin] = useState([]);
   const [editableFields, setEditableFields] = useState([]);
   const [checkboxStates, setCheckboxStates] = useState({});
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [updatedValues, setUpdatedValues] = useState({});
 
   const fetchAdminList = async () => {
     const adminData = await getAdminData();
@@ -85,6 +88,32 @@ const AdminList = () => {
     fetchAdminList(); // Refresh the admin list after update
   };
 
+  const handleEdit = (params) => {
+    const selectedAdmin = getAdmin.find((admin) => admin.id === params.row.id);
+    setSelectedRow(selectedAdmin);
+    setOpen(true);
+    setUpdatedValues(selectedAdmin);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setUpdatedValues({});
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setUpdatedValues((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = async () => {
+    await updateAdmin(selectedRow.id, updatedValues);
+    handleClose();
+    fetchAdminList(); // Refresh the admin list after update
+  };
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
@@ -92,18 +121,13 @@ const AdminList = () => {
   const roles = ['Installer', 'Customer', 'Service', 'Material', 'Payments'];
 
   const columns = [
-        {
+    {
       field: "shown_id",
       headerName: "ID",
       cellClassName: (params) =>
         params.row.email === "Brian@readicharge.com" ? "highlighted-row" : "",
     },
-    {
-      field: "id",
-      headerName: "Reference ID",
-      cellClassName: (params) =>
-        params.row.email === "Brian@readicharge.com" ? "highlighted-row" : "",
-    },
+    
     {
       field: "name",
       headerName: "Name",
@@ -170,9 +194,9 @@ const AdminList = () => {
               variant="contained"
               style={{ marginLeft: "16px" }}
               color="primary"
-              onClick={() => handleUpdate(params.row.id, params.row)}
+              onClick={() => handleEdit(params)}
             >
-              Update
+              Edit
             </Button>
           </Box>
         ),
@@ -232,6 +256,68 @@ const AdminList = () => {
           />
         </Box>
       </Box>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Edit Admin</DialogTitle>
+        <DialogContent>
+          {selectedRow && (
+            <>
+              <TextField
+                name="name"
+                label="Name"
+                value={updatedValues.name || ""}
+                onChange={handleInputChange}
+                fullWidth
+                style={{ marginBottom: "16px" ,marginTop:"16px" }}
+              />
+              <TextField
+                name="email"
+                label="Email"
+                value={updatedValues.email || ""}
+                onChange={handleInputChange}
+                fullWidth
+                disabled
+                style={{ marginBottom: "16px" }}
+              />
+              <TextField
+                name="phoneNumber"
+                label="Phone Number"
+                value={updatedValues.phoneNumber || ""}
+                onChange={handleInputChange}
+                fullWidth
+                style={{ marginBottom: "16px" }}
+              />
+              <TextField
+                name="address"
+                label="Address"
+                value={updatedValues.address || ""}
+                onChange={handleInputChange}
+                fullWidth
+                style={{ marginBottom: "16px" }}
+              />
+              <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
+                {roles.map((role) => (
+                  <div key={role} style={{ marginRight: "16px" }}>
+                    <Checkbox
+                      checked={updatedValues.roles?.includes(role) || false}
+                      onChange={() => handleRoleCheckboxChange(selectedRow.id, role)}
+                    />
+                    <Typography>{role}</Typography>
+                  </div>
+                ))}
+              </div>
+            </>
+
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

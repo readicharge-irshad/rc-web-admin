@@ -170,9 +170,9 @@ const [chartData3, setChartData3] = useState([]);
         </FormControl>
 
         <form onSubmit={handleSubmit}>
-          <Grid spacing={2}>
+          <Grid spacing={8}>
             <Grid container item>
-              <div style={{ height: '84vh', overflow: 'auto' }}>
+              <div style={{ height: '70vh', overflow: 'auto' }}>
                 <Table>
                   <TableHead>
                     <TableRow>

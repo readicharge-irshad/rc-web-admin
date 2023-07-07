@@ -4,12 +4,12 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { createService } from "../../data/ApiController.js";
+
 const Service = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = (values) => {
-    //  name, description, certification, yearsOfExperienceerience,notes
-    createService(values)
+    createService(values);
   };
 
   return (
@@ -33,10 +33,7 @@ const Service = () => {
             <Box
               display="grid"
               gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-              }}
+              gridTemplateColumns={isNonMobile ? "2fr 1fr 1fr" : "1fr"}
             >
               <TextField
                 fullWidth
@@ -49,33 +46,6 @@ const Service = () => {
                 name="name"
                 error={!!touched.name && !!errors.name}
                 helperText={touched.name && errors.name}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Service Description"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.description}
-                name="description"
-                error={!!touched.description && !!errors.description}
-                helperText={touched.description && errors.description}
-                sx={{ gridColumn: "span 2" }}
-              />
-                  <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Additional Notes"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.notes}
-                name="notes"
-                error={!!touched.description && !!errors.description}
-                helperText={touched.description && errors.description}
-                sx={{ gridColumn: "span 2" }}
               />
               <TextField
                 fullWidth
@@ -88,7 +58,6 @@ const Service = () => {
                 name="certification"
                 error={!!touched.certification && !!errors.certification}
                 helperText={touched.certification && errors.certification}
-                sx={{ gridColumn: "span 2" }}
               />
               <TextField
                 fullWidth
@@ -101,11 +70,37 @@ const Service = () => {
                 name="yearsOfExperience"
                 error={!!touched.yearsOfExperience && !!errors.yearsOfExperience}
                 helperText={touched.yearsOfExperience && errors.yearsOfExperience}
-                sx={{ gridColumn: "span 2" }}
               />
-             
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Service Description"
+                multiline
+                rows={8}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.description}
+                name="description"
+                error={!!touched.description && !!errors.description}
+                helperText={touched.description && errors.description}
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Additional Notes"
+                multiline
+                rows={8}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.notes}
+                name="notes"
+                error={!!touched.notes && !!errors.notes}
+                helperText={touched.notes && errors.notes}
+              />
             </Box>
-            <Box display="flex"  mt="20px">
+            <Box display="flex" mt="20px">
               <Button type="submit" color="primary" variant="contained">
                 Create New Service
               </Button>
@@ -117,20 +112,18 @@ const Service = () => {
   );
 };
 
-
 const checkoutSchema = yup.object().shape({
-  name: yup.string().required("required"),
-  description: yup.string().required("required"),
-  certification: yup.string().required("required"),
-  yearsOfExperience: yup.string().required("required")
-
+  name: yup.string().required("Required"),
+  description: yup.string().required("Required"),
+  certification: yup.string().required("Required"),
+  yearsOfExperience: yup.string().required("Required"),
 });
+
 const initialValues = {
   name: "",
   description: "",
   certification: "",
   yearsOfExperience: "",
-
 };
 
 export default Service;

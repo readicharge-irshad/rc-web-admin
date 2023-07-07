@@ -11,7 +11,7 @@ import statesJson from "../states.json";
       const stateData = states.find((s) => s.attributes.name === state);
       if (stateData) {
         colorMap[stateData.attributes.abbreviation] = {
-          fill: percentage>10&&percentage<30?"#90ee90":(percentage>=30&&percentage<70)?"#ff7f50":"#87ceeb"
+          fill: percentage>0&&percentage<2?"#90ee90":(percentage>=2&&percentage<7)?"#ff7f50":"#87ceeb"
         };
       }
     });

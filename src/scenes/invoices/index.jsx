@@ -119,8 +119,6 @@ const handleRowUpdate = async (params) => {
   const columns = [
     { field: "shown_id", headerName: "ID", width: 100 },
     { field: "date", headerName: "Date", width: 200, editable: true },
-    { field: "time_start", headerName: "Start Time", width: 150, editable: true },
-    { field: "time_end", headerName: "End Time", width: 150, editable: true },
     { field: "number_of_installs", headerName: "Number of Installs", width: 200 },
     { field: "materialCost", headerName: "Material Cost", width: 200 },
     { field: "customerShowingCost", headerName: "Customer Showing Cost", width: 250 },
@@ -128,7 +126,6 @@ const handleRowUpdate = async (params) => {
     { field: "completionStatus", headerName: "Completion Status", width: 200 },
     { field: "shown_installer", headerName: "Installer", width: 200 },
     { field: "service", headerName: "Service", width: 200 },
-    { field: "machinePurchasedByUser", headerName: "Machine Purchased By User", width: 250 },
     { field: "labourRates", headerName: "Labour Rates", width: 200 },
     
     {
