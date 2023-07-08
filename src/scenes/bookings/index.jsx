@@ -153,7 +153,7 @@ const BookingForm = ({admin}) => {
   }
 
   return (
- <Box style={{paddingLeft:"30px"}}>
+ <Box style={{paddingLeft:"30px" , height:"400px"}}>
     <Header title="Book A Ticket" subtitle="Create a New Ticket for the Installation"  />
     <Box
       m="50px"
